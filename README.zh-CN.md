@@ -2,7 +2,9 @@
 
 **面向学习与严肃知识工作的本地优先知识检索引擎。**
 
-[English](README.md) · [安全策略](SECURITY.md) · [参与贡献](CONTRIBUTING.md)
+**文档语言：** [English](README.md) · **简体中文（当前页面）**
+
+[安全策略](SECURITY.md) · [参与贡献](CONTRIBUTING.md)
 
 Chilon Recall 可将你自己的文本资料转换为私有、来源可追溯的知识库，并通过本地 MCP 提供给 Codex、Claude Desktop 等客户端。你可以询问资料内容、比较概念、制作复习提纲，或从长期笔记中找回某项论据，同时保留来源路径、证据边界和索引操作记录。
 

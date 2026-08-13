@@ -2,11 +2,19 @@
 
 **Local-first knowledge retrieval for learning and serious knowledge work.**
 
-[简体中文](README.zh-CN.md) · [Security](SECURITY.md) · [Contributing](CONTRIBUTING.md)
+**Documentation:** English (this page) · **[简体中文（完整文档）](README.zh-CN.md)**
+
+[Security](SECURITY.md) · [Contributing](CONTRIBUTING.md)
 
 Chilon Recall turns your own text documents into a private, source-backed knowledge base that any local MCP client can use. Ask what your materials say, compare concepts, build review outlines, or recover a claim from months of notes—while keeping source paths, evidence boundaries, and index operations visible.
 
 It is an independent retrieval companion in the [Chilon Knowledge Work Harness](https://github.com/ctrlcakepro/chilon-knowledge-work-harness) family. The two projects remain separate: Chilon Recall owns local retrieval; the harness can orchestrate broader long-running knowledge work.
+
+> **中文简介**
+>
+> Chilon Recall 是一款面向学习与严肃知识工作的本地优先 MCP 知识检索引擎。它把你自己的 Markdown、TXT、RST 和 CSV 资料转换为私有、来源可追溯的知识库，支持教材问答、概念比较、章节总结、复习提纲和长期笔记检索。
+>
+> **[阅读完整中文文档 →](README.zh-CN.md)**
 
 ## Why Chilon Recall?
 
