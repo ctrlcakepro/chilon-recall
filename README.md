@@ -2,47 +2,62 @@
 
 **Local-first knowledge retrieval for learning and serious knowledge work.**
 
+**面向学习与严肃知识工作的本地优先知识检索。**
+
 **Documentation:** English (this page) · **[简体中文（完整文档）](README.zh-CN.md)**
+
+**文档语言：** English（当前页面，逐段双语）· **[简体中文（完整文档）](README.zh-CN.md)**
 
 [Security](SECURITY.md) · [Contributing](CONTRIBUTING.md)
 
+[安全策略](SECURITY.md) · [参与贡献](CONTRIBUTING.md)
+
 Chilon Recall turns your own text documents into a private, source-backed knowledge base that any local MCP client can use. Ask what your materials say, compare concepts, build review outlines, or recover a claim from months of notes—while keeping source paths, evidence boundaries, and index operations visible.
+
+Chilon Recall 将你自己的文本资料转换为私有、来源可追溯的知识库，并可供任何本地 MCP 客户端调用。你可以询问资料内容、比较概念、制作复习提纲，或从长期笔记中找回论据，同时保留来源路径、证据边界和索引操作的可见性。
 
 It is an independent retrieval companion in the [Chilon Knowledge Work Harness](https://github.com/ctrlcakepro/chilon-knowledge-work-harness) family. The two projects remain separate: Chilon Recall owns local retrieval; the harness can orchestrate broader long-running knowledge work.
 
-> **中文简介**
->
-> Chilon Recall 是一款面向学习与严肃知识工作的本地优先 MCP 知识检索引擎。它把你自己的 Markdown、TXT、RST 和 CSV 资料转换为私有、来源可追溯的知识库，支持教材问答、概念比较、章节总结、复习提纲和长期笔记检索。
->
-> **[阅读完整中文文档 →](README.zh-CN.md)**
+它是 [Chilon Knowledge Work Harness](https://github.com/ctrlcakepro/chilon-knowledge-work-harness) 产品线中的独立检索组件。两个项目保持分离：Chilon Recall 负责本地检索；harness 可编排更广泛的长期知识工作。
 
-## Why Chilon Recall?
+## Why Chilon Recall? / 为什么使用 Chilon Recall？
 
 - **Grounded learning** — answer from the material you chose, not from an untraceable memory of it.
+- **基于资料学习**——先回答“你选择的资料说了什么”，而不是依赖无法追溯的模型印象。
 - **Source-backed answers** — every hit carries a relative file path, headings, an approximate line number, and retrieval scores.
+- **答案可追溯**——每条结果都包含相对文件路径、标题层级、近似行号和检索分数。
 - **Local-first control** — documents and FAISS indexes stay on your machine. Only the text sent to your configured embedding/reranking providers leaves it.
+- **本地优先控制**——文档和 FAISS 索引保留在你的设备上；只有发送给自选 embedding/reranking provider 的文本会离开设备。
 - **Safe operations** — builds happen in staging; clear and restore actions use previews, short-lived confirmation tokens, and recoverable backups.
+- **安全操作**——建库在 staging 目录中完成；清理和恢复使用预览、短期确认 token 与可恢复备份。
 - **MCP portability** — one `stdio` server works with Codex, Claude Desktop, and other MCP-compatible local clients.
+- **MCP 可移植性**——同一个 `stdio` server 可用于 Codex、Claude Desktop 及其他兼容的本地客户端。
 
-## Built for learning and knowledge work
+## Built for learning and knowledge work / 为学习与知识工作而设计
 
 Chilon Recall supports both direct retrieval and reusable learning workflows:
 
-| Need | Tool | What it returns |
+Chilon Recall 同时支持直接检索和可复用的学习工作流：
+
+| Need / 需求 | Tool / 工具 | What it returns / 返回内容 |
 | --- | --- | --- |
-| Recover a claim from notes or reports | `rag_query` | Ranked passages with source metadata |
-| Answer from course or reference material | `textbook_qa` | Direct-answer evidence packet |
-| Distinguish two ideas or methods | `concept_compare` | Evidence for a comparison table |
-| Turn a chapter into structured notes | `chapter_summary` | Broad summary evidence and coverage cautions |
-| Prepare for review or an exam | `review_outline` | Concepts, relationships, confusions, and practice prompts |
+| Recover a claim from notes or reports<br>从笔记或报告找回论据 | `rag_query` | Ranked passages with source metadata<br>带来源元数据的排序片段 |
+| Answer from course or reference material<br>基于课程或参考资料回答问题 | `textbook_qa` | Direct-answer evidence packet<br>直接回答所需的证据包 |
+| Distinguish two ideas or methods<br>区分两个概念或方法 | `concept_compare` | Evidence for a comparison table<br>适合整理比较表的证据 |
+| Turn a chapter into structured notes<br>将章节转为结构化笔记 | `chapter_summary` | Broad summary evidence and coverage cautions<br>章节总结证据与覆盖提醒 |
+| Prepare for review or an exam<br>复习或备考 | `review_outline` | Concepts, relationships, confusions, and practice prompts<br>概念、联系、易混点与练习提示 |
 
 The bundled synthetic demo material covers retrieval practice, spaced review, evidence boundaries, and research triangulation. It is safe to redistribute and contains no private or copyrighted textbook content.
 
-## Five-minute quick start
+仓库附带的合成演示资料涵盖检索练习、间隔复习、证据边界和研究三角验证。它可以安全再分发，不包含个人资料或受版权保护的教材内容。
 
-### 1. Install the runtimes
+## Five-minute quick start / 五分钟快速开始
+
+### 1. Install the runtimes / 安装运行环境
 
 You need Node.js 20+ and Python 3.10+.
+
+需要 Node.js 20+ 和 Python 3.10+。
 
 ```bash
 git clone https://github.com/ctrlcakepro/chilon-recall.git
@@ -52,6 +67,8 @@ python -m venv .venv
 ```
 
 Activate the virtual environment:
+
+激活虚拟环境：
 
 ```powershell
 # Windows PowerShell
@@ -65,15 +82,21 @@ source .venv/bin/activate
 
 Then install the Python engine:
 
+然后安装 Python 引擎：
+
 ```bash
 python -m pip install -e .
 ```
 
-### 2. Create a private configuration
+### 2. Create a private configuration / 创建私有配置
 
 Copy `config/chilon-recall.example.json` to `config/chilon-recall.json`. The destination is ignored by Git.
 
+将 `config/chilon-recall.example.json` 复制为 `config/chilon-recall.json`。目标文件已被 Git 忽略。
+
 Set `project_dir` to the folder containing your documents and `rag_dir` to a dedicated child directory. Keep credentials out of JSON:
+
+将 `project_dir` 设为资料目录，将 `rag_dir` 设为其中的专用子目录。不要把凭据写入 JSON：
 
 ```powershell
 $env:RAG_MANAGER_CONFIG = (Resolve-Path .\config\chilon-recall.json)
@@ -89,7 +112,9 @@ export CHILON_RECALL_PYTHON="$PWD/.venv/bin/python"
 
 `config/siliconflow.example.json` is included as a provider example. Chilon Recall is not tied to SiliconFlow: embeddings use an OpenAI-compatible `/embeddings` endpoint, and reranking uses a Cohere-compatible rerank endpoint. Disable reranking if your provider does not offer it.
 
-### 3. Start the MCP server
+仓库提供 `config/siliconflow.example.json` 作为 provider 示例，但 Chilon Recall 并不绑定 SiliconFlow：embedding 使用 OpenAI-compatible `/embeddings` endpoint，reranking 使用 Cohere-compatible rerank endpoint。若 provider 不提供 reranker，可将其禁用。
+
+### 3. Start the MCP server / 启动 MCP server
 
 ```bash
 npm start
@@ -97,13 +122,19 @@ npm start
 
 The server uses `stdio`, so it normally runs under an MCP client rather than in a standalone interactive terminal. Connect it, call `rag_status`, preview `rag_build`, and execute the build with the returned confirmation token.
 
-## Connect an MCP client
+server 使用 `stdio`，因此通常由 MCP client 启动，而不是作为独立交互式终端运行。连接后，先调用 `rag_status`，预览 `rag_build`，再使用返回的 confirmation token 执行建库。
+
+## Connect an MCP client / 连接 MCP client
 
 Use absolute paths in client configuration. They are more reliable than assuming a launch directory.
 
-### Codex
+客户端配置应使用绝对路径，避免依赖不确定的启动目录。
+
+### Codex / Codex 配置
 
 Current Codex clients support local `stdio MCP` servers and share the same `config.toml`. Add a server through the ChatGPT desktop app's **Settings → MCP servers**, with `codex mcp add`, or in `~/.codex/config.toml`:
+
+当前 Codex client 支持本地 `stdio MCP` server，并共享同一份 `config.toml`。可通过 ChatGPT desktop app 的 **Settings → MCP servers**、`codex mcp add`，或在 `~/.codex/config.toml` 中添加：
 
 ```toml
 [mcp_servers.chilon-recall]
@@ -117,9 +148,13 @@ default_tools_approval_mode = "writes"
 
 The repository is also a valid Codex plugin (`.codex-plugin/plugin.json`, `.mcp.json`, and bundled skills). For a cloned source checkout, direct MCP configuration remains the clearest installation method until a registry package is published.
 
-### Claude Desktop
+仓库也是合法的 Codex plugin，包含 `.codex-plugin/plugin.json`、`.mcp.json` 与内置 skills。在发布 registry package 之前，从源码 clone 后直接配置 MCP 仍是最清楚的安装方式。
+
+### Claude Desktop / Claude Desktop 配置
 
 Add this to `claude_desktop_config.json`, replacing every example path:
+
+将以下内容加入 `claude_desktop_config.json`，并替换所有示例路径：
 
 ```json
 {
@@ -140,7 +175,9 @@ Add this to `claude_desktop_config.json`, replacing every example path:
 
 Set `RAG_API_KEY` in the environment inherited by Claude Desktop, or add it only to your private local client configuration when your operating system cannot provide it. Claude Desktop stores `env` values in a local JSON file, so restrict file permissions and never commit that file. On Windows, use the virtual environment's `python.exe` path.
 
-## How it works
+应在 Claude Desktop 可继承的系统环境中设置 `RAG_API_KEY`；若操作系统无法提供，只能把它加入本机私有 client 配置。Claude Desktop 会将 `env` 值存入本地 JSON，因此应限制文件权限，且绝不能提交该文件。Windows 用户应指向虚拟环境中的 `python.exe`。
+
+## How it works / 工作原理
 
 ```text
 Private text documents
@@ -157,11 +194,30 @@ question ──► vector recall ──► optional reranking
 structured MCP evidence with relative source paths
 ```
 
+```text
+私有文本资料
+        │
+        ▼
+标题感知分块 ──► OpenAI-compatible embeddings
+        │
+        ▼
+本地 FAISS 索引 + JSON 来源元数据
+        │
+问题 ──► 向量召回 ──► 可选 reranking
+        │
+        ▼
+带相对来源路径的结构化 MCP 证据
+```
+
 The Node.js MCP host owns configuration validation, source discovery, approval tokens, path safety, backups, and client-facing tools. The Python engine owns chunking, provider calls, FAISS serialization, and retrieval. Index files are read and written through Python byte I/O so non-ASCII paths work reliably on Windows.
 
-## Tool reference
+Node.js MCP host 负责配置验证、资料发现、approval token、路径安全、备份和面向 client 的工具。Python engine 负责分块、provider 调用、FAISS 序列化与检索。索引通过 Python byte I/O 读写，以便在 Windows 的非 ASCII 路径下可靠工作。
+
+## Tool reference / 工具一览
 
 Read-only tools:
+
+只读工具：
 
 - `rag_status`
 - `rag_list_documents`
@@ -174,39 +230,65 @@ Read-only tools:
 
 Configuration and index tools:
 
+配置和索引工具：
+
 - `rag_save_config` updates only schema-approved, non-secret fields and creates a backup of the JSON file.
+- `rag_save_config` 仅修改 schema 允许的非敏感字段，并创建 JSON 文件备份。
 - `rag_build`, `rag_clear_index`, and `rag_restore_index` require `action: "preview"` first. The preview returns a short-lived token bound to the current configuration and source/index state. Use that token once with `action: "execute"`.
+- `rag_build`、`rag_clear_index` 与 `rag_restore_index` 必须先使用 `action: "preview"`。预览会返回一个绑定当前配置和来源/索引状态的短期 token，再使用该 token 一次性执行 `action: "execute"`。
 
-## Provider configuration
+## Provider configuration / Provider 配置
 
-### Embeddings
+### Embeddings / 向量化
 
 The first release supports the `openai-compatible` adapter. Configure:
+
+首版支持 `openai-compatible` adapter，需要配置：
 
 - `base_url`
 - `model`
 - `api_key_env`
 - optional `doc_prefix` and `query_prefix`
 
+- `base_url`
+- `model`
+- `api_key_env`
+- 可选的 `doc_prefix` 和 `query_prefix`
+
 The key itself must exist only in the named environment variable.
 
-### Reranking
+key 本身只能存在于指定的环境变量中。
+
+### Reranking / 重排序
 
 The `cohere-compatible` adapter sends `model`, `query`, `documents`, `top_n`, and `return_documents` to the configured URL. Set `enabled` to `false` to return top FAISS matches directly.
 
+`cohere-compatible` adapter 会向配置的 URL 发送 `model`、`query`、`documents`、`top_n` 和 `return_documents`。将 `enabled` 设为 `false` 可直接返回排名靠前的 FAISS matches。
+
 Provider compatibility is an interface claim, not a guarantee that every nominally compatible service behaves identically. Test your selected models with the synthetic demo before indexing private documents or incurring large costs.
 
-## Data safety
+Provider 兼容性只是接口层面的声明，并不保证每个标称兼容的服务行为完全相同。在索引私有资料或产生较大费用前，应先用合成示例测试你选择的模型。
+
+## Data safety / 数据安全
 
 - The server binds to one `RAG_MANAGER_CONFIG`; individual tool calls cannot select arbitrary configuration files.
+- server 固定绑定一个 `RAG_MANAGER_CONFIG`；单次 tool call 不能选择任意配置文件。
 - Secret-shaped keys are rejected in Python configuration loading. Provider credentials come from environment variables.
+- Python 配置加载会拒绝疑似 secret 的字段；provider 凭据从环境变量读取。
 - Absolute source paths are hidden unless `display.expose_absolute_paths` is explicitly enabled.
+- 除非显式启用 `display.expose_absolute_paths`，否则不会暴露绝对来源路径。
 - The active index, staging area, and backups must resolve inside `rag_dir`; root and out-of-bound operations are rejected.
+- active index、staging area 和 backups 必须解析到 `rag_dir` 内部；根目录和越界操作会被拒绝。
 - A new build never modifies the active index until all required files exist.
+- 新建库在所有必需文件就绪前绝不会修改 active index。
 - Clearing moves the active index into `backups/`. Restoring backs up the current index first.
+- 清理操作会把 active index 移入 `backups/`；恢复前会先备份当前索引。
 - Confirmation tokens expire after ten minutes, are single-use, and become invalid if source, config, or index state changes.
+- Confirmation token 十分钟后过期，且只能使用一次；来源、配置或索引状态变化时也会失效。
 
 Before publishing changes, run:
+
+发布修改前运行：
 
 ```bash
 npm run check
@@ -215,24 +297,37 @@ npm audit --audit-level=high
 
 The publication check rejects likely secrets, personal email addresses, and user-profile paths in tracked source files.
 
-## Limits
+发布检查会拒绝 tracked source files 中疑似的 secret、个人邮箱和用户目录路径。
+
+## Limits / 已知限制
 
 - Version 0.1.0 indexes UTF-8 `.md`, `.txt`, `.rst`, and `.csv` text. Convert PDFs to reviewed text first; scanned PDFs need OCR.
+- v0.1.0 只索引 UTF-8 `.md`、`.txt`、`.rst` 和 `.csv` 文本。PDF 应先转换为经过核对的文本；扫描版 PDF 需要 OCR。
 - The included chunker recognizes Markdown `#` and `##` headings. It does not yet parse tables, citations, or document-native structure semantically.
+- 内置 chunker 识别 Markdown `#` 和 `##` headings，暂时不会从语义上解析表格、引文或原生文档结构。
 - Rebuilding is full-index, not incremental.
+- 当前建库是全量重建，不是增量索引。
 - Local embedding and reranker models are not bundled in the first release.
+- 首版不内置本地 embedding 和 reranker 模型。
 - Retrieval returns evidence candidates; it does not prove that the collection is complete, current, correct, or internally consistent.
+- 检索返回的是证据候选，不能证明资料集合完整、最新、正确或内部一致。
 
-## Roadmap
+## Roadmap / 路线图
 
 - Incremental indexing and content hashing
+- 基于内容哈希的增量索引
 - First-class PDF extraction/OCR adapters with coverage reports
+- 带覆盖报告的 PDF 提取/OCR adapter
 - Local embedding and reranking providers
+- 本地 embedding 与 reranking provider
 - Additional source filters and collection namespaces
+- 更多来源过滤条件和 collection namespace
 - Evaluation fixtures for retrieval quality and citation coverage
+- 用于检索质量和引用覆盖率的评估 fixtures
 - npm/PyPI distribution after the source-install workflow stabilizes
+- 源码安装流程稳定后发布 npm/PyPI distribution
 
-## Development
+## Development / 开发
 
 ```bash
 npm install
@@ -242,6 +337,10 @@ npm run check
 
 Tests use synthetic documents and mock provider endpoints, so they do not need a paid API key. See [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md).
 
-## License
+测试使用合成资料与 mock provider endpoint，因此不需要付费 API key。参阅 [CONTRIBUTING.md](CONTRIBUTING.md) 和 [SECURITY.md](SECURITY.md)。
+
+## License / 许可证
 
 [MIT](LICENSE) © 2026 ctrlcakepro and contributors.
+
+项目使用 [MIT](LICENSE) 许可证，© 2026 ctrlcakepro and contributors。
