@@ -1,0 +1,4 @@
+interface:
+  display_name: "Chapter Summary"
+  short_description: "Summarize chapters into source-backed notes."
+  default_prompt: "Use $chapter-summary to summarize a chapter from my local knowledge base."

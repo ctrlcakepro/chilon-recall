@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Outline"
+  short_description: "Build focused evidence-backed study outlines."
+  default_prompt: "Use $review-outline to create a study outline from my local knowledge base."

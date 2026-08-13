@@ -1,0 +1,35 @@
+name: Bug report
+description: Report a reproducible Chilon Recall problem
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Do not include API keys, private documents, absolute personal paths, or private index data.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Include the tool or command, expected behavior, and sanitized error output.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Chilon Recall version
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Operating system, Node.js, Python, and MCP client
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Use synthetic documents and a redacted configuration.
+    validations:
+      required: true
+

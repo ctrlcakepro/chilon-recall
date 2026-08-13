@@ -1,0 +1,4 @@
+interface:
+  display_name: "Concept Compare"
+  short_description: "Compare concepts with grounded evidence."
+  default_prompt: "Use $concept-compare to compare two concepts using my local knowledge base."

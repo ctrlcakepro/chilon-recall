@@ -1,0 +1,4 @@
+interface:
+  display_name: "Textbook QA"
+  short_description: "Answer questions with source-backed evidence."
+  default_prompt: "Use $textbook-qa to answer a course question with evidence from my local knowledge base."

@@ -1,0 +1,57 @@
+{
+  "name": "chilon-recall",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A local-first MCP knowledge engine for grounded learning, document recall, and serious knowledge work.",
+  "type": "module",
+  "bin": {
+    "chilon-recall-mcp": "./scripts/server.mjs"
+  },
+  "files": [
+    ".codex-plugin",
+    ".mcp.json",
+    "config",
+    "examples",
+    "python",
+    "scripts",
+    "skills",
+    "src",
+    "LICENSE",
+    "README.md",
+    "README.zh-CN.md",
+    "pyproject.toml"
+  ],
+  "scripts": {
+    "start": "node scripts/server.mjs",
+    "test": "npm run test:node && npm run test:python",
+    "test:node": "node --test tests/node/*.test.mjs",
+    "test:python": "python -m unittest discover -s tests/python -p test_*.py",
+    "check:public": "node scripts/check-publication.mjs",
+    "check": "npm test && npm run check:public"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "mcp",
+    "rag",
+    "learning-tools",
+    "knowledge-management",
+    "local-first",
+    "faiss"
+  ],
+  "author": "ctrlcakepro",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ctrlcakepro/chilon-recall.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ctrlcakepro/chilon-recall/issues"
+  },
+  "homepage": "https://github.com/ctrlcakepro/chilon-recall#readme",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^3.25.76"
+  }
+}

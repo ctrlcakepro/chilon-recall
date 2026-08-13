@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "project_dir": "../examples/knowledge-base",
+  "rag_dir": "../examples/knowledge-base/.chilon-recall",
+  "file_extensions": [
+    ".md",
+    ".txt",
+    ".rst",
+    ".csv"
+  ],
+  "embedding": {
+    "adapter": "openai-compatible",
+    "base_url": "https://api.example.com/v1",
+    "model": "your-embedding-model",
+    "api_key_env": "RAG_API_KEY",
+    "doc_prefix": "",
+    "query_prefix": ""
+  },
+  "reranker": {
+    "enabled": false,
+    "adapter": "cohere-compatible"
+  },
+  "chunking": {
+    "max_chars": 800,
+    "overlap_chars": 100,
+    "min_chars": 40
+  },
+  "retrieval": {
+    "retrieve_top_k": 20,
+    "rerank_top_n": 5
+  },
+  "build": {
+    "batch_size": 16
+  },
+  "display": {
+    "expose_absolute_paths": false
+  }
+}
+

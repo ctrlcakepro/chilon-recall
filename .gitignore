@@ -1,0 +1,35 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+config/chilon-recall.json
+config/*.local.json
+*.bak
+
+# Knowledge sources, indexes, and backups
+.chilon-recall/
+/knowledge-base/
+faiss_db/
+backups/
+*.faiss
+
+# JavaScript
+node_modules/
+npm-debug.log*
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Tooling and generated work
+.scaffold/
+.test-tmp/
+coverage/
+dist/
+build/
+.DS_Store
+Thumbs.db

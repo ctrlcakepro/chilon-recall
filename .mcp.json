@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "chilon-recall": {
+      "command": "node",
+      "args": [
+        "./scripts/server.mjs"
+      ],
+      "env_vars": [
+        "RAG_MANAGER_CONFIG",
+        "RAG_API_KEY",
+        "RAG_RERANK_API_KEY",
+        "CHILON_RECALL_PYTHON"
+      ]
+    }
+  }
+}

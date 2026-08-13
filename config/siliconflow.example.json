@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "project_dir": "../examples/knowledge-base",
+  "rag_dir": "../examples/knowledge-base/.chilon-recall",
+  "file_extensions": [
+    ".md",
+    ".txt",
+    ".rst",
+    ".csv"
+  ],
+  "embedding": {
+    "adapter": "openai-compatible",
+    "base_url": "https://api.siliconflow.cn/v1",
+    "model": "BAAI/bge-m3",
+    "api_key_env": "RAG_API_KEY",
+    "doc_prefix": "为这个句子生成表示以用于检索相关文章：",
+    "query_prefix": "为这个句子生成表示以用于检索相关文章："
+  },
+  "reranker": {
+    "enabled": true,
+    "adapter": "cohere-compatible",
+    "url": "https://api.siliconflow.cn/v1/rerank",
+    "model": "Qwen/Qwen3-Reranker-8B",
+    "api_key_env": "RAG_API_KEY"
+  },
+  "chunking": {
+    "max_chars": 800,
+    "overlap_chars": 100,
+    "min_chars": 40
+  },
+  "retrieval": {
+    "retrieve_top_k": 20,
+    "rerank_top_n": 5
+  },
+  "build": {
+    "batch_size": 16
+  },
+  "display": {
+    "expose_absolute_paths": false
+  }
+}
+

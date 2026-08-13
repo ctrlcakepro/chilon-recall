@@ -1,0 +1,41 @@
+{
+  "name": "chilon-recall",
+  "version": "0.1.0",
+  "description": "Local-first knowledge retrieval for learning and serious knowledge work.",
+  "author": {
+    "name": "ctrlcakepro",
+    "url": "https://github.com/ctrlcakepro"
+  },
+  "homepage": "https://github.com/ctrlcakepro/chilon-recall",
+  "repository": "https://github.com/ctrlcakepro/chilon-recall",
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "rag",
+    "learning",
+    "knowledge-management",
+    "local-first"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Chilon Recall",
+    "shortDescription": "Grounded recall for learning and knowledge work.",
+    "longDescription": "Turn private documents into a source-backed local knowledge base for learning, research, and reusable knowledge workflows.",
+    "developerName": "ctrlcakepro",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write",
+      "Search"
+    ],
+    "websiteURL": "https://github.com/ctrlcakepro/chilon-recall",
+    "defaultPrompt": [
+      "Answer this question from my sources and show the evidence.",
+      "Compare these concepts using my local knowledge base.",
+      "Turn this topic into a source-backed review outline."
+    ],
+    "brandColor": "#5146E5"
+  }
+}
+
