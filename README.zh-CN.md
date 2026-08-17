@@ -32,9 +32,28 @@ Chilon Recall 可将你自己的文本资料转换为私有、来源可追溯的
 
 ## 五分钟快速开始
 
-### 1. 安装运行环境
+### 1. 使用 npm 安装
 
-需要 Node.js 20+ 与 Python 3.10+：
+需要 Node.js 20+ 与 Python 3.10+。npm CLI 会创建独立 Python virtual environment，不会把凭据写入 package 或配置文件。
+
+在该版本发布到 npm 后，可使用以下命令创建私有配置并安装独立 Python engine：
+
+```powershell
+npx -y chilon-recall@0.1.0 init C:\path\to\your\documents
+npx -y chilon-recall@0.1.0 setup
+```
+
+托管 engine 保存在临时 npx cache 之外。可用 CHILON_RECALL_HOME 指定其他持久位置；升级 package 后再次运行 setup。
+
+设置 RAG_MANAGER_CONFIG 与 provider 凭据后，可运行 doctor 检查运行环境和私有配置：
+
+```powershell
+$env:RAG_MANAGER_CONFIG = "C:\path\to\your\documents\chilon-recall.json"
+$env:RAG_API_KEY = "your-provider-key"
+npx -y chilon-recall@0.1.0 doctor
+```
+
+npm 版本尚未发布或参与开发时，请使用以下源码流程：
 
 ```bash
 git clone https://github.com/ctrlcakepro/chilon-recall.git
@@ -62,6 +81,8 @@ python -m pip install -e .
 ```
 
 ### 2. 创建私有配置
+
+通过 npm 安装时，init 已在资料目录写入 chilon-recall.json，并将 project_dir 设为 .、rag_dir 设为 ./.chilon-recall。编辑其中的 provider 字段即可；不要把 API key 写入 JSON。
 
 把 `config/chilon-recall.example.json` 复制为 `config/chilon-recall.json`。目标文件已被 Git 忽略。
 
@@ -107,7 +128,42 @@ tool_timeout_sec = 1800
 default_tools_approval_mode = "writes"
 ```
 
-仓库也包含合法的 Codex plugin 结构：`.codex-plugin/plugin.json`、`.mcp.json` 和四个学习 skills。在发布 registry package 之前，从源码 clone 后直接配置 MCP 是最清楚可靠的安装方式。
+对于 npm 已发布版本，请改用固定版本的 npx 命令。先在同一操作系统账户下运行 npx -y chilon-recall@0.1.0 setup；固定版本可避免 package 意外升级改变已正常工作的 MCP server。
+
+```toml
+[mcp_servers.chilon-recall]
+command = "npx"
+args = ["-y", "chilon-recall@0.1.0", "mcp"]
+env_vars = ["RAG_MANAGER_CONFIG", "RAG_API_KEY", "RAG_RERANK_API_KEY"]
+startup_timeout_sec = 15
+tool_timeout_sec = 1800
+default_tools_approval_mode = "writes"
+```
+
+仓库也包含合法的 Codex plugin 结构：`.codex-plugin/plugin.json`、`.mcp.json` 和四个学习 skills。源码 clone 时请使用上方直接 node 配置，并将 CHILON_RECALL_PYTHON 指向对应 virtual environment。
+
+### DeepSeek Harness
+
+仓库同时提供 DeepSeek Harness bundle。它使用 DSH 官方的 `@deepseek-ai/dsh-mcp-client` bridge，因此现有 MCP 工具会以 `mcp__chilon-recall__rag_status` 等稳定名称暴露给 DSH；不会重复运行检索引擎，也不会把凭据作为 tool 参数传给模型。
+
+源码 checkout 时，设置绝对项目路径和同一份私有配置。一次性运行时无需安装 bundle，直接使用 overlay：
+
+```powershell
+$env:CHILON_RECALL_ROOT = (Resolve-Path .).Path
+$env:RAG_MANAGER_CONFIG = (Resolve-Path .\config\chilon-recall.json).Path
+$env:RAG_API_KEY = "your-provider-key"
+dsh --profile web --patch .\dsh\cordis.patch.yml
+```
+
+如果要持久安装到 DSH profile，请先安装一次仓库 bundle，再启动 profile。Windows 当前 DSH/pnpm 的路径转发可能拆分含空格的源码路径，必要时请使用 8.3 短路径：
+
+```powershell
+$bundlePathForDsh = (cmd /c "for %I in (.) do @echo %~sI").Trim()
+dsh plugin --profile web add $bundlePathForDsh
+dsh --profile web
+```
+
+bundle 会在 `CHILON_RECALL_ROOT` 中运行 `node scripts/cli.mjs mcp`。如果私有配置需要，可继续设置 `RAG_RERANK_API_KEY`、`CHILON_RECALL_HOME` 或 `CHILON_RECALL_PYTHON`。DSH 仍属于 developer preview，其 bundle 或 plugin API 可能独立于 Chilon Recall 发生变化。
 
 ### Claude Desktop
 
@@ -128,6 +184,13 @@ default_tools_approval_mode = "writes"
     }
   }
 }
+```
+
+对于 npm 已发布版本，请把 command 和 args 替换为以下内容，并省略 CHILON_RECALL_PYTHON；它由 setup 管理：
+
+```json
+"command": "npx",
+"args": ["-y", "chilon-recall@0.1.0", "mcp"]
 ```
 
 应在 Claude Desktop 能继承的系统环境中设置 `RAG_API_KEY`；若操作系统无法提供，只能把它加入你本机的私有客户端配置。Claude Desktop 会把 `env` 值保存在本地 JSON 中，因此请限制文件权限，且绝不能提交该配置。Windows 用户应指向虚拟环境中的 `python.exe`。
@@ -211,7 +274,7 @@ npm audit --audit-level=high
 - 本地 embedding 与 reranking provider
 - 来源过滤和 collection namespace
 - 检索质量及引用覆盖 eval fixtures
-- 源码安装稳定后发布 npm/PyPI package
+- 发布经过验证的 npm package 与独立 Python engine package
 
 ## 开发与许可
 

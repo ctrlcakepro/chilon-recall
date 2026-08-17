@@ -9,4 +9,5 @@ All notable changes to this project will be documented in this file.
 - Staged index builds with recoverable backup, clear, and restore operations.
 - OpenAI-compatible embedding and Cohere-compatible reranking adapters.
 - Codex plugin metadata and Claude Desktop/Codex setup guides.
-
+- npm/npx CLI with safe config initialization, managed Python engine setup, diagnostics, and stdio MCP startup.
+- DeepSeek Harness bundle integration through the official DSH MCP client bridge.

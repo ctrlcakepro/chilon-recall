@@ -1,18 +1,18 @@
 {
   "name": "chilon-recall",
   "version": "0.1.0",
-  "private": true,
   "description": "A local-first MCP knowledge engine for grounded learning, document recall, and serious knowledge work.",
   "type": "module",
   "bin": {
-    "chilon-recall-mcp": "./scripts/server.mjs"
+    "chilon-recall": "./scripts/cli.mjs"
   },
   "files": [
+    "dsh/cordis.patch.yml",
     ".codex-plugin",
     ".mcp.json",
-    "config",
+    "config/*.example.json",
     "examples",
-    "python",
+    "python/**/*.py",
     "scripts",
     "skills",
     "src",
@@ -21,8 +21,13 @@
     "README.zh-CN.md",
     "pyproject.toml"
   ],
+  "dsh": {
+    "bundle": {
+      "patch": "./dsh/cordis.patch.yml"
+    }
+  },
   "scripts": {
-    "start": "node scripts/server.mjs",
+    "start": "node scripts/cli.mjs mcp",
     "test": "npm run test:node && npm run test:python",
     "test:node": "node --test tests/node/*.test.mjs",
     "test:python": "python -m unittest discover -s tests/python -p test_*.py",
@@ -42,6 +47,9 @@
   ],
   "author": "ctrlcakepro",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ctrlcakepro/chilon-recall.git"

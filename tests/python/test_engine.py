@@ -61,7 +61,6 @@ class MockProvider(BaseHTTPRequestHandler):
 class EngineIntegrationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.test_temp = Path(__file__).resolve().parents[2] / ".test-tmp"
         cls.server = ThreadingHTTPServer(("127.0.0.1", 0), MockProvider)
         cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
         cls.thread.start()
@@ -71,11 +70,9 @@ class EngineIntegrationTests(unittest.TestCase):
         cls.server.shutdown()
         cls.server.server_close()
         cls.thread.join(timeout=2)
-        cls.test_temp.rmdir()
 
     def setUp(self) -> None:
-        self.test_temp.mkdir(exist_ok=True)
-        self.temp = tempfile.TemporaryDirectory(dir=self.test_temp)
+        self.temp = tempfile.TemporaryDirectory(prefix="chilon-engine-")
         self.root = Path(self.temp.name)
         self.project = self.root / "knowledge"
         self.rag = self.project / ".chilon-recall"
