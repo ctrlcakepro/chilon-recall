@@ -18,7 +18,7 @@ const rules = [
 async function files(directory) {
   const output = [];
   for (const entry of await fs.readdir(directory, { withFileTypes: true })) {
-    if (ignored.has(entry.name)) continue;
+    if (ignored.has(entry.name) || entry.name.startsWith(".npm-cache-")) continue;
     const target = path.join(directory, entry.name);
     if (entry.isDirectory()) output.push(...(await files(target)));
     else if (entry.isFile()) output.push(target);

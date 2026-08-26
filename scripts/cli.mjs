@@ -20,6 +20,8 @@ import { startStdioServer } from "../src/server.mjs";
 const help = `Chilon Recall — local-first MCP knowledge retrieval
 
 Usage:
+  chilon-recall install <directory> [--force]
+                                      Create a private config and install the Python engine.
   chilon-recall init <directory> [--force]
                                       Create a private config in a document directory.
   chilon-recall setup       Create or update the isolated Python engine.
@@ -58,6 +60,19 @@ export async function initializeConfig(directory, { force = false } = {}) {
   config.rag_dir = "./.chilon-recall";
   await fs.writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`, { encoding: "utf8", flag: force ? "w" : "wx" });
   return configPath;
+}
+
+export async function installProject(directory, { force = false, setup = setupEngine } = {}) {
+  if (!directory) {
+    throw new Error("install requires a document directory.");
+  }
+  const engine = await setup();
+  const configPath = await initializeConfig(directory, { force });
+  return {
+    config: configPath,
+    engine,
+    next: "Set RAG_MANAGER_CONFIG to this path and provide provider credentials only through environment variables."
+  };
 }
 
 function writeJson(value) {
@@ -132,6 +147,16 @@ export async function main(argv = process.argv.slice(2)) {
   }
   if (command === "setup") {
     writeJson(await setupEngine());
+    return 0;
+  }
+  if (command === "install") {
+    const args = argv.slice(1);
+    const force = args.includes("--force");
+    const directory = args.find((arg) => arg !== "--force");
+    if (args.filter((arg) => arg !== "--force").length > 1) {
+      throw new Error("`install` accepts at most one document directory.");
+    }
+    writeJson(await installProject(directory, { force }));
     return 0;
   }
   if (command === "init") {

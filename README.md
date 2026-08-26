@@ -59,18 +59,21 @@ You need Node.js 20+ and Python 3.10+.
 
 需要 Node.js 20+ 和 Python 3.10+。
 
-After the npm release is published, install the isolated Python engine and create a private configuration with:
+After the npm release is published, create a private configuration and install the isolated Python engine with one command:
 
-npm 版本发布后，可用以下命令安装独立 Python engine 并创建私有配置：
+npm 版本发布后，只需一条命令即可创建私有配置并安装独立 Python engine：
 
 ```powershell
-npx -y chilon-recall@0.1.0 init C:\path\to\your\documents
-npx -y chilon-recall@0.1.0 setup
+npx -y chilon-recall@0.1.1 install C:\path\to\your\documents
 ```
 
-The managed engine lives outside the temporary npx cache. Use CHILON_RECALL_HOME to choose a different persistent location, and run setup after upgrading the package.
+The managed engine lives outside the temporary npx cache. Use CHILON_RECALL_HOME to choose a different persistent location, and run `setup` after upgrading the package.
 
-托管 engine 保存在临时 npx cache 之外。可用 CHILON_RECALL_HOME 指定其他持久位置；升级 package 后再次运行 setup。
+托管 engine 保存在临时 npx cache 之外。可用 CHILON_RECALL_HOME 指定其他持久位置；升级 package 后再次运行 `setup`。
+
+Installation never writes credentials into the package or configuration file. To query or build an index, set the provider key in your own environment after installation.
+
+安装过程不会把凭据写入 package 或配置文件。要执行查询或建库，请在安装完成后由你自己在环境变量中设置 provider key。
 
 To validate the runtime and private configuration, set RAG_MANAGER_CONFIG and the provider credentials, then run:
 
@@ -79,7 +82,7 @@ To validate the runtime and private configuration, set RAG_MANAGER_CONFIG and th
 ```powershell
 $env:RAG_MANAGER_CONFIG = "C:\path\to\your\documents\chilon-recall.json"
 $env:RAG_API_KEY = "your-provider-key"
-npx -y chilon-recall@0.1.0 doctor
+npx -y chilon-recall@0.1.1 doctor
 ```
 
 For a source checkout or before the npm release is published, use the following source workflow instead:
@@ -173,14 +176,14 @@ tool_timeout_sec = 1800
 default_tools_approval_mode = "writes"
 ```
 
-For an npm release, use a pinned npx command instead. Run npx -y chilon-recall@0.1.0 setup first under the same OS account. A pinned version prevents an unexpected package upgrade from changing a working MCP server.
+For an npm release, use a pinned npx command instead. Run npx -y chilon-recall@0.1.1 setup first under the same OS account. A pinned version prevents an unexpected package upgrade from changing a working MCP server.
 
-对于 npm 已发布版本，请改用固定版本的 npx 命令。先在同一操作系统账户下运行 npx -y chilon-recall@0.1.0 setup；固定版本可避免 package 意外升级改变已正常工作的 MCP server。
+对于 npm 已发布版本，请改用固定版本的 npx 命令。先在同一操作系统账户下运行 npx -y chilon-recall@0.1.1 setup；固定版本可避免 package 意外升级改变已正常工作的 MCP server。
 
 ```toml
 [mcp_servers.chilon-recall]
 command = "npx"
-args = ["-y", "chilon-recall@0.1.0", "mcp"]
+args = ["-y", "chilon-recall@0.1.1", "mcp"]
 env_vars = ["RAG_MANAGER_CONFIG", "RAG_API_KEY", "RAG_RERANK_API_KEY"]
 startup_timeout_sec = 15
 tool_timeout_sec = 1800
@@ -251,7 +254,7 @@ For an npm release, replace command and args with the following and omit CHILON_
 
 ```json
 "command": "npx",
-"args": ["-y", "chilon-recall@0.1.0", "mcp"]
+"args": ["-y", "chilon-recall@0.1.1", "mcp"]
 ```
 
 Set `RAG_API_KEY` in the environment inherited by Claude Desktop, or add it only to your private local client configuration when your operating system cannot provide it. Claude Desktop stores `env` values in a local JSON file, so restrict file permissions and never commit that file. On Windows, use the virtual environment's `python.exe` path.
@@ -382,8 +385,8 @@ The publication check rejects likely secrets, personal email addresses, and user
 
 ## Limits / 已知限制
 
-- Version 0.1.0 indexes UTF-8 `.md`, `.txt`, `.rst`, and `.csv` text. Convert PDFs to reviewed text first; scanned PDFs need OCR.
-- v0.1.0 只索引 UTF-8 `.md`、`.txt`、`.rst` 和 `.csv` 文本。PDF 应先转换为经过核对的文本；扫描版 PDF 需要 OCR。
+- Version 0.1.1 indexes UTF-8 `.md`, `.txt`, `.rst`, and `.csv` text. Convert PDFs to reviewed text first; scanned PDFs need OCR.
+- v0.1.1 只索引 UTF-8 `.md`、`.txt`、`.rst` 和 `.csv` 文本。PDF 应先转换为经过核对的文本；扫描版 PDF 需要 OCR。
 - The included chunker recognizes Markdown `#` and `##` headings. It does not yet parse tables, citations, or document-native structure semantically.
 - 内置 chunker 识别 Markdown `#` 和 `##` headings，暂时不会从语义上解析表格、引文或原生文档结构。
 - Rebuilding is full-index, not incremental.

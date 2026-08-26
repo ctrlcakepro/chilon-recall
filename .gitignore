@@ -16,6 +16,8 @@ backups/
 # JavaScript
 node_modules/
 npm-debug.log*
+.npm-cache-*/
+.one-click-*/
 
 # Python
 .venv/

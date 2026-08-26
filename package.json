@@ -1,10 +1,10 @@
 {
   "name": "chilon-recall",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A local-first MCP knowledge engine for grounded learning, document recall, and serious knowledge work.",
   "type": "module",
   "bin": {
-    "chilon-recall": "./scripts/cli.mjs"
+    "chilon-recall": "scripts/cli.mjs"
   },
   "files": [
     "dsh/cordis.patch.yml",

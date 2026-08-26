@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { initializeConfig } from "../../scripts/cli.mjs";
+import { initializeConfig, installProject } from "../../scripts/cli.mjs";
 import { parsePythonVersion, runtimeHome, supportsPython, venvDir, venvPython } from "../../src/runtime.mjs";
 
 test("runtime paths respect platform defaults and explicit overrides", () => {
@@ -36,4 +36,20 @@ test("init creates a local configuration without overwriting existing work", asy
   assert.equal(config.rag_dir, "./.chilon-recall");
   await assert.rejects(initializeConfig(directory), /Configuration already exists/);
   await fs.rm(directory, { recursive: true, force: true });
+});
+
+test("install creates a configuration only after the engine setup succeeds", async () => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), "chilon-install-"));
+  const engine = { python: "managed-python" };
+  const result = await installProject(directory, { setup: async () => engine });
+  assert.equal(result.engine, engine);
+  assert.equal(result.config, path.join(directory, "chilon-recall.json"));
+  assert.equal(JSON.parse(await fs.readFile(result.config, "utf8")).project_dir, ".");
+  await fs.rm(directory, { recursive: true, force: true });
+});
+
+test("install does not create a configuration when engine setup fails", async () => {
+  const directory = path.join(os.tmpdir(), `chilon-install-fail-${process.pid}-${Date.now()}`);
+  await assert.rejects(installProject(directory, { setup: async () => { throw new Error("engine setup failed"); } }), /engine setup failed/);
+  await assert.rejects(fs.access(directory), /ENOENT/);
 });
