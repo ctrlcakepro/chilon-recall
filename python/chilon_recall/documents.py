@@ -76,8 +76,9 @@ def _sliding_chunks(
 
 
 def chunk_document(file_path: Path, config: dict[str, Any]) -> list[dict[str, Any]]:
+    file_path = file_path.resolve()
     text = file_path.read_text(encoding="utf-8", errors="ignore")
-    project_dir: Path = config["_project_dir"]
+    project_dir = Path(config["_project_dir"]).resolve()
     settings = config["chunking"]
     max_chars = settings["max_chars"]
     overlap_chars = settings["overlap_chars"]

@@ -1,6 +1,6 @@
 {
   "name": "chilon-recall",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A local-first MCP knowledge engine for grounded learning, document recall, and serious knowledge work.",
   "type": "module",
   "bin": {

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chilon-recall-engine"
-version = "0.1.1"
+version = "0.1.2"
 description = "FAISS indexing and retrieval engine for Chilon Recall"
 readme = "README.md"
 requires-python = ">=3.10"

@@ -39,7 +39,7 @@ Chilon Recall 可将你自己的文本资料转换为私有、来源可追溯的
 在该版本发布到 npm 后，只需一条命令即可创建私有配置并安装独立 Python engine：
 
 ```powershell
-npx -y chilon-recall@0.1.1 install C:\path\to\your\documents
+npx -y chilon-recall@0.1.2 install C:\path\to\your\documents
 ```
 
 托管 engine 保存在临时 npx cache 之外。可用 CHILON_RECALL_HOME 指定其他持久位置；升级 package 后再次运行 `setup`。
@@ -51,7 +51,7 @@ npx -y chilon-recall@0.1.1 install C:\path\to\your\documents
 ```powershell
 $env:RAG_MANAGER_CONFIG = "C:\path\to\your\documents\chilon-recall.json"
 $env:RAG_API_KEY = "your-provider-key"
-npx -y chilon-recall@0.1.1 doctor
+npx -y chilon-recall@0.1.2 doctor
 ```
 
 npm 版本尚未发布或参与开发时，请使用以下源码流程：
@@ -129,12 +129,12 @@ tool_timeout_sec = 1800
 default_tools_approval_mode = "writes"
 ```
 
-对于 npm 已发布版本，请改用固定版本的 npx 命令。先在同一操作系统账户下运行 npx -y chilon-recall@0.1.1 setup；固定版本可避免 package 意外升级改变已正常工作的 MCP server。
+对于 npm 已发布版本，请改用固定版本的 npx 命令。先在同一操作系统账户下运行 npx -y chilon-recall@0.1.2 setup；固定版本可避免 package 意外升级改变已正常工作的 MCP server。
 
 ```toml
 [mcp_servers.chilon-recall]
 command = "npx"
-args = ["-y", "chilon-recall@0.1.1", "mcp"]
+args = ["-y", "chilon-recall@0.1.2", "mcp"]
 env_vars = ["RAG_MANAGER_CONFIG", "RAG_API_KEY", "RAG_RERANK_API_KEY"]
 startup_timeout_sec = 15
 tool_timeout_sec = 1800
@@ -191,7 +191,7 @@ bundle 会在 `CHILON_RECALL_ROOT` 中运行 `node scripts/cli.mjs mcp`。如果
 
 ```json
 "command": "npx",
-"args": ["-y", "chilon-recall@0.1.1", "mcp"]
+"args": ["-y", "chilon-recall@0.1.2", "mcp"]
 ```
 
 应在 Claude Desktop 能继承的系统环境中设置 `RAG_API_KEY`；若操作系统无法提供，只能把它加入你本机的私有客户端配置。Claude Desktop 会把 `env` 值保存在本地 JSON 中，因此请限制文件权限，且绝不能提交该配置。Windows 用户应指向虚拟环境中的 `python.exe`。
@@ -262,7 +262,7 @@ npm audit --audit-level=high
 
 ## 已知限制
 
-- v0.1.1 只索引 UTF-8 `.md`、`.txt`、`.rst`、`.csv`。PDF 应先转换为经过核对的文本，扫描版需 OCR。
+- v0.1.2 只索引 UTF-8 `.md`、`.txt`、`.rst`、`.csv`。PDF 应先转换为经过核对的文本，扫描版需 OCR。
 - 分块器识别 Markdown `#` 与 `##` 标题，尚未语义解析表格、引文或原生文档结构。
 - 当前为全量重建，不支持增量索引。
 - 首版不内置本地 embedding/reranker 模型。

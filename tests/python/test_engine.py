@@ -128,6 +128,20 @@ class EngineIntegrationTests(unittest.TestCase):
         self.assertIn(chunks[0]["h2"], {"Retrieval practice", "Spaced review"})
         self.assertGreaterEqual(chunks[0]["line"], 1)
 
+    @unittest.skipUnless(os.name == "nt", "Windows short-path behavior")
+    def test_chunking_normalizes_windows_short_file_path(self) -> None:
+        import ctypes
+
+        config = load_config(self.config_path)
+        project_dir = Path(config["_project_dir"])
+        buffer = ctypes.create_unicode_buffer(32_768)
+        length = ctypes.windll.kernel32.GetShortPathNameW(str(project_dir), buffer, len(buffer))
+        if not length or buffer.value.casefold() == str(project_dir).casefold():
+            self.skipTest("The temporary directory has no distinct 8.3 path.")
+
+        chunks = chunk_document(Path(buffer.value) / "notes.md", config)
+        self.assertEqual(chunks[0]["file"], "notes.md")
+
     def test_mock_provider_build_and_query(self) -> None:
         config = load_config(self.config_path)
         output = self.rag / "faiss_db"
