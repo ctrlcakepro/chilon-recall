@@ -20,6 +20,34 @@ It is an independent retrieval companion in the [Chilon Knowledge Work Harness](
 
 它是 [Chilon Knowledge Work Harness](https://github.com/ctrlcakepro/chilon-knowledge-work-harness) 产品线中的独立检索组件。两个项目保持分离：Chilon Recall 负责本地检索；harness 可编排更广泛的长期知识工作。
 
+## Start here / 新手先看
+
+**New to MCP? You only need a document folder, Node.js 20+, and Python 3.10+. Follow these three steps first; client configuration and technical details come later.**
+
+**第一次接触 MCP？你只需要一个资料文件夹、Node.js 20+ 和 Python 3.10+。先完成下面三步；客户端配置和技术细节在后文。**
+
+1. **Install into your document folder / 安装到资料文件夹。** Run the command below once. It creates a private configuration and a managed Python engine; it never stores API keys in the package or configuration file.
+
+   **运行一次下面的命令。** 它会创建私有配置与受管 Python engine；不会把 API key 写入 package 或配置文件。
+
+   ```powershell
+   npx -y chilon-recall@0.1.2 install C:\path\to\your\documents
+   ```
+
+2. **Set your provider key / 设置 provider key。** Open the generated `chilon-recall.json` to choose the provider endpoint and model, then set the key only in your environment. Run `doctor` to confirm the setup.
+
+   **打开生成的 `chilon-recall.json` 选择 provider endpoint 与 model，再只在环境变量中设置密钥。** 运行 `doctor` 确认环境可用。
+
+   ```powershell
+   $env:RAG_MANAGER_CONFIG = "C:\path\to\your\documents\chilon-recall.json"
+   $env:RAG_API_KEY = "your-provider-key"
+   npx -y chilon-recall@0.1.2 doctor
+   ```
+
+3. **Connect one client / 连接一个客户端。** Start with [Codex](#codex--codex-配置) or [Claude Desktop](#claude-desktop--claude-desktop-配置). The client starts the local server for you; you do not need to keep a separate terminal open.
+
+   **从 [Codex](#codex--codex-配置) 或 [Claude Desktop](#claude-desktop--claude-desktop-配置) 开始即可。** 客户端会替你启动本地 server，无需另开终端长期运行。
+
 ## Why Chilon Recall? / 为什么使用 Chilon Recall？
 
 - **Grounded learning** — answer from the material you chose, not from an untraceable memory of it.
@@ -51,7 +79,7 @@ The bundled synthetic demo material covers retrieval practice, spaced review, ev
 
 仓库附带的合成演示资料涵盖检索练习、间隔复习、证据边界和研究三角验证。它可以安全再分发，不包含个人资料或受版权保护的教材内容。
 
-## Five-minute quick start / 五分钟快速开始
+## Detailed setup and configuration / 详细安装与配置
 
 ### 1. Install with npm / npm 安装
 
@@ -59,9 +87,9 @@ You need Node.js 20+ and Python 3.10+.
 
 需要 Node.js 20+ 和 Python 3.10+。
 
-After the npm release is published, create a private configuration and install the isolated Python engine with one command:
+Use the published, pinned npm release to create a private configuration and install the isolated Python engine with one command:
 
-npm 版本发布后，只需一条命令即可创建私有配置并安装独立 Python engine：
+使用已发布且固定版本的 npm package，只需一条命令即可创建私有配置并安装独立 Python engine：
 
 ```powershell
 npx -y chilon-recall@0.1.2 install C:\path\to\your\documents
@@ -70,6 +98,10 @@ npx -y chilon-recall@0.1.2 install C:\path\to\your\documents
 The managed engine lives outside the temporary npx cache. Use CHILON_RECALL_HOME to choose a different persistent location, and run `setup` after upgrading the package.
 
 托管 engine 保存在临时 npx cache 之外。可用 CHILON_RECALL_HOME 指定其他持久位置；升级 package 后再次运行 `setup`。
+
+The command writes `chilon-recall.json` in the document directory and creates a persistent managed Python engine in the operating system's user-data area (or CHILON_RECALL_HOME). These files are required for local operation; credentials remain outside both files.
+
+该命令会在资料目录写入 `chilon-recall.json`，并在操作系统用户数据目录（或 CHILON_RECALL_HOME）创建持久的受管 Python engine。这些文件是本地运行所必需的；凭据不会写入其中。
 
 Installation never writes credentials into the package or configuration file. To query or build an index, set the provider key in your own environment after installation.
 
@@ -85,40 +117,11 @@ $env:RAG_API_KEY = "your-provider-key"
 npx -y chilon-recall@0.1.2 doctor
 ```
 
-For a source checkout or before the npm release is published, use the following source workflow instead:
+If you installed from npm, you can now skip to [Connect an MCP client](#connect-an-mcp-client--连接-mcp-客户端). The remaining setup details are for source checkouts or custom configurations.
 
-源码 checkout 或 npm 版本尚未发布时，请使用以下源码流程：
+如果你通过 npm 安装，现在可以直接前往 [连接 MCP 客户端](#connect-an-mcp-client--连接-mcp-客户端)。以下内容面向源码 checkout 或需要自定义配置的用户。
 
-```bash
-git clone https://github.com/ctrlcakepro/chilon-recall.git
-cd chilon-recall
-npm install
-python -m venv .venv
-```
-
-Activate the virtual environment:
-
-激活虚拟环境：
-
-```powershell
-# Windows PowerShell
-.\.venv\Scripts\Activate.ps1
-```
-
-```bash
-# macOS or Linux
-source .venv/bin/activate
-```
-
-Then install the Python engine:
-
-然后安装 Python 引擎：
-
-```bash
-python -m pip install -e .
-```
-
-### 2. Create a private configuration / 创建私有配置
+### 2. Manual private configuration / 手动私有配置
 
 Copy `config/chilon-recall.example.json` to `config/chilon-recall.json`. The destination is ignored by Git.
 
@@ -144,7 +147,7 @@ export CHILON_RECALL_PYTHON="$PWD/.venv/bin/python"
 
 仓库提供 `config/siliconflow.example.json` 作为 provider 示例，但 Chilon Recall 并不绑定 SiliconFlow：embedding 使用 OpenAI-compatible `/embeddings` endpoint，reranking 使用 Cohere-compatible rerank endpoint。若 provider 不提供 reranker，可将其禁用。
 
-### 3. Start the MCP server / 启动 MCP server
+### 3. Start the source-checkout MCP server / 启动源码 checkout 的 MCP server
 
 ```bash
 npm start
@@ -203,6 +206,10 @@ The repository also ships a DeepSeek Harness bundle. It uses DSH's official `@de
 For a source checkout, set an absolute project root and the same private configuration used by the ordinary MCP client. You can apply the bundle for a one-off run without installing it:
 
 源码 checkout 可按以下方式设置绝对项目路径和同一份私有配置。一次性运行时无需安装 bundle，直接使用 overlay：
+
+Current DSH limitation: the bundle forwards only RAG_MANAGER_CONFIG, RAG_API_KEY, RAG_RERANK_API_KEY, CHILON_RECALL_HOME, and CHILON_RECALL_PYTHON. Use the standard RAG key variable names with DSH until arbitrary `api_key_env` forwarding is added.
+
+当前 DSH 限制：bundle 只转发 RAG_MANAGER_CONFIG、RAG_API_KEY、RAG_RERANK_API_KEY、CHILON_RECALL_HOME 和 CHILON_RECALL_PYTHON。在支持任意 `api_key_env` 转发之前，使用 DSH 时请采用标准 RAG 密钥环境变量名。
 
 ```powershell
 $env:CHILON_RECALL_ROOT = (Resolve-Path .).Path
@@ -412,6 +419,35 @@ The publication check rejects likely secrets, personal email addresses, and user
 - 发布经过验证的 npm package 与独立 Python engine package
 
 ## Development / 开发
+
+### Source checkout / 源码 checkout
+
+Use this workflow only when developing Chilon Recall or when you need a source-based configuration instead of the npm installer:
+
+仅在开发 Chilon Recall，或需要源码配置而非 npm installer 时使用以下流程：
+
+```bash
+git clone https://github.com/ctrlcakepro/chilon-recall.git
+cd chilon-recall
+npm install
+python -m venv .venv
+```
+
+Activate the virtual environment, then install the Python engine:
+
+激活 virtual environment 后安装 Python engine：
+
+```powershell
+# Windows PowerShell
+.\.venv\Scripts\Activate.ps1
+python -m pip install -e .
+```
+
+```bash
+# macOS or Linux
+source .venv/bin/activate
+python -m pip install -e .
+```
 
 ```bash
 npm install
