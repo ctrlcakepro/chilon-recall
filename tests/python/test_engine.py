@@ -61,7 +61,6 @@ class MockProvider(BaseHTTPRequestHandler):
 class EngineIntegrationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.test_temp = Path(__file__).resolve().parents[2] / ".test-tmp"
         cls.server = ThreadingHTTPServer(("127.0.0.1", 0), MockProvider)
         cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
         cls.thread.start()
@@ -71,11 +70,9 @@ class EngineIntegrationTests(unittest.TestCase):
         cls.server.shutdown()
         cls.server.server_close()
         cls.thread.join(timeout=2)
-        cls.test_temp.rmdir()
 
     def setUp(self) -> None:
-        self.test_temp.mkdir(exist_ok=True)
-        self.temp = tempfile.TemporaryDirectory(dir=self.test_temp)
+        self.temp = tempfile.TemporaryDirectory(prefix="chilon-engine-")
         self.root = Path(self.temp.name)
         self.project = self.root / "knowledge"
         self.rag = self.project / ".chilon-recall"
@@ -130,6 +127,20 @@ class EngineIntegrationTests(unittest.TestCase):
         self.assertEqual(chunks[0]["h1"], "Learning")
         self.assertIn(chunks[0]["h2"], {"Retrieval practice", "Spaced review"})
         self.assertGreaterEqual(chunks[0]["line"], 1)
+
+    @unittest.skipUnless(os.name == "nt", "Windows short-path behavior")
+    def test_chunking_normalizes_windows_short_file_path(self) -> None:
+        import ctypes
+
+        config = load_config(self.config_path)
+        project_dir = Path(config["_project_dir"])
+        buffer = ctypes.create_unicode_buffer(32_768)
+        length = ctypes.windll.kernel32.GetShortPathNameW(str(project_dir), buffer, len(buffer))
+        if not length or buffer.value.casefold() == str(project_dir).casefold():
+            self.skipTest("The temporary directory has no distinct 8.3 path.")
+
+        chunks = chunk_document(Path(buffer.value) / "notes.md", config)
+        self.assertEqual(chunks[0]["file"], "notes.md")
 
     def test_mock_provider_build_and_query(self) -> None:
         config = load_config(self.config_path)

@@ -80,7 +80,7 @@ test("stdio MCP discovers tools and invokes rag_status", async () => {
     env,
     stderr: "pipe"
   });
-  const client = new Client({ name: "chilon-recall-test", version: "0.1.0" });
+  const client = new Client({ name: "chilon-recall-test", version: "0.1.2" });
   try {
     await client.connect(transport);
     const listed = await client.listTools();

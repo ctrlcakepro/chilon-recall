@@ -1,4 +1,3 @@
 """Chilon Recall indexing and retrieval engine."""
 
-__version__ = "0.1.0"
-
+__version__ = "0.1.2"
