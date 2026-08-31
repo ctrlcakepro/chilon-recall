@@ -10,6 +10,26 @@ Chilon Recall 可将你自己的文本资料转换为私有、来源可追溯的
 
 它是 [Chilon Knowledge Work Harness](https://github.com/ctrlcakepro/chilon-knowledge-work-harness) 品牌下的独立检索产品。两个项目保持分离：Chilon Recall 负责本地检索，原 harness 可以继续编排更广泛的长期知识工作。
 
+## 新手先看
+
+第一次接触 MCP？你只需要一个资料文件夹、Node.js 20+ 和 Python 3.10+。先完成下面三步；客户端配置和技术细节在后文。
+
+1. **安装到资料文件夹。** 运行一次下面的命令。它会创建私有配置与受管 Python engine；不会把 API key 写入 package 或配置文件。
+
+   ```powershell
+   npx -y chilon-recall@0.1.2 install C:\path\to\your\documents
+   ```
+
+2. **设置 provider key。** 打开生成的 `chilon-recall.json`，选择 provider endpoint 与 model，再只在环境变量中设置密钥。运行 `doctor` 确认环境可用。
+
+   ```powershell
+   $env:RAG_MANAGER_CONFIG = "C:\path\to\your\documents\chilon-recall.json"
+   $env:RAG_API_KEY = "your-provider-key"
+   npx -y chilon-recall@0.1.2 doctor
+   ```
+
+3. **连接一个客户端。** 从 [Codex](#codex) 或 [Claude Desktop](#claude-desktop) 开始即可。客户端会替你启动本地 server，无需另开终端长期运行。
+
 ## 为什么使用 Chilon Recall？
 
 - **基于资料学习**：先回答“你选择的资料说了什么”，避免把模型印象当成来源事实。
@@ -30,19 +50,21 @@ Chilon Recall 可将你自己的文本资料转换为私有、来源可追溯的
 
 仓库中的示例资料完全为合成内容，不包含真实教材、个人笔记或私有索引。
 
-## 五分钟快速开始
+## 详细安装与配置
 
 ### 1. 使用 npm 安装
 
 需要 Node.js 20+ 与 Python 3.10+。npm CLI 会创建独立 Python virtual environment，不会把凭据写入 package 或配置文件。
 
-在该版本发布到 npm 后，只需一条命令即可创建私有配置并安装独立 Python engine：
+使用已发布且固定版本的 npm package，只需一条命令即可创建私有配置并安装独立 Python engine：
 
 ```powershell
 npx -y chilon-recall@0.1.2 install C:\path\to\your\documents
 ```
 
 托管 engine 保存在临时 npx cache 之外。可用 CHILON_RECALL_HOME 指定其他持久位置；升级 package 后再次运行 `setup`。
+
+该命令会在资料目录写入 `chilon-recall.json`，并在操作系统用户数据目录（或 CHILON_RECALL_HOME）创建持久的受管 Python engine。这些文件是本地运行所必需的；凭据不会写入其中。
 
 安装过程不会把凭据写入 package 或配置文件。要执行查询或建库，请在安装完成后由你自己在环境变量中设置 provider key。
 
@@ -54,34 +76,9 @@ $env:RAG_API_KEY = "your-provider-key"
 npx -y chilon-recall@0.1.2 doctor
 ```
 
-npm 版本尚未发布或参与开发时，请使用以下源码流程：
+如果你通过 npm 安装，现在可以直接前往 [连接 MCP 客户端](#连接-mcp-客户端)。以下内容面向源码 checkout 或需要自定义配置的用户。
 
-```bash
-git clone https://github.com/ctrlcakepro/chilon-recall.git
-cd chilon-recall
-npm install
-python -m venv .venv
-```
-
-激活虚拟环境：
-
-```powershell
-# Windows PowerShell
-.\.venv\Scripts\Activate.ps1
-```
-
-```bash
-# macOS 或 Linux
-source .venv/bin/activate
-```
-
-安装 Python 引擎：
-
-```bash
-python -m pip install -e .
-```
-
-### 2. 创建私有配置
+### 2. 手动私有配置
 
 通过 npm 安装时，init 已在资料目录写入 chilon-recall.json，并将 project_dir 设为 .、rag_dir 设为 ./.chilon-recall。编辑其中的 provider 字段即可；不要把 API key 写入 JSON。
 
@@ -103,7 +100,7 @@ export CHILON_RECALL_PYTHON="$PWD/.venv/bin/python"
 
 仓库提供 `config/siliconflow.example.json` 作为示例，但项目并不绑定 SiliconFlow。Embedding 使用 OpenAI-compatible `/embeddings` endpoint，reranker 使用 Cohere-compatible endpoint；没有 reranker 时可将其禁用。
 
-### 3. 启动 MCP server
+### 3. 启动源码 checkout 的 MCP server
 
 ```bash
 npm start
@@ -148,6 +145,8 @@ default_tools_approval_mode = "writes"
 仓库同时提供 DeepSeek Harness bundle。它使用 DSH 官方的 `@deepseek-ai/dsh-mcp-client` bridge，因此现有 MCP 工具会以 `mcp__chilon-recall__rag_status` 等稳定名称暴露给 DSH；不会重复运行检索引擎，也不会把凭据作为 tool 参数传给模型。
 
 源码 checkout 时，设置绝对项目路径和同一份私有配置。一次性运行时无需安装 bundle，直接使用 overlay：
+
+当前 DSH 限制：bundle 只转发 RAG_MANAGER_CONFIG、RAG_API_KEY、RAG_RERANK_API_KEY、CHILON_RECALL_HOME 和 CHILON_RECALL_PYTHON。在支持任意 `api_key_env` 转发之前，使用 DSH 时请采用标准 RAG 密钥环境变量名。
 
 ```powershell
 $env:CHILON_RECALL_ROOT = (Resolve-Path .).Path
@@ -278,6 +277,31 @@ npm audit --audit-level=high
 - 发布经过验证的 npm package 与独立 Python engine package
 
 ## 开发与许可
+
+### 源码 checkout
+
+仅在开发 Chilon Recall，或需要源码配置而非 npm installer 时使用以下流程：
+
+```bash
+git clone https://github.com/ctrlcakepro/chilon-recall.git
+cd chilon-recall
+npm install
+python -m venv .venv
+```
+
+激活 virtual environment 后安装 Python engine：
+
+```powershell
+# Windows PowerShell
+.\.venv\Scripts\Activate.ps1
+python -m pip install -e .
+```
+
+```bash
+# macOS 或 Linux
+source .venv/bin/activate
+python -m pip install -e .
+```
 
 ```bash
 npm install
