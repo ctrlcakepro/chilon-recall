@@ -17,7 +17,7 @@ Chilon Recall 可将你自己的文本资料转换为私有、来源可追溯的
 1. **安装到资料文件夹。** 运行一次下面的命令。它会创建私有配置与受管 Python engine；不会把 API key 写入 package 或配置文件。
 
    ```powershell
-   npx -y chilon-recall@0.1.2 install C:\path\to\your\documents
+   npx -y chilon-recall@0.1.3 install C:\path\to\your\documents
    ```
 
 2. **设置 provider key。** 打开生成的 `chilon-recall.json`，选择 provider endpoint 与 model，再只在环境变量中设置密钥。运行 `doctor` 确认环境可用。
@@ -25,7 +25,7 @@ Chilon Recall 可将你自己的文本资料转换为私有、来源可追溯的
    ```powershell
    $env:RAG_MANAGER_CONFIG = "C:\path\to\your\documents\chilon-recall.json"
    $env:RAG_API_KEY = "your-provider-key"
-   npx -y chilon-recall@0.1.2 doctor
+   npx -y chilon-recall@0.1.3 doctor
    ```
 
 3. **连接一个客户端。** 从 [Codex](#codex) 或 [Claude Desktop](#claude-desktop) 开始即可。客户端会替你启动本地 server，无需另开终端长期运行。
@@ -47,6 +47,7 @@ Chilon Recall 可将你自己的文本资料转换为私有、来源可追溯的
 | 区分两个概念或方法 | `concept_compare` | 适合比较表的证据 |
 | 把章节整理成结构化笔记 | `chapter_summary` | 章节总结证据与覆盖提醒 |
 | 复习或备考 | `review_outline` | 概念、联系、易混点和练习题 |
+| 资料变更后刷新索引 | `rag_sync` | 新增、修改、删除、未变更的文件数，以及复用与重新嵌入的向量数 |
 
 仓库中的示例资料完全为合成内容，不包含真实教材、个人笔记或私有索引。
 
@@ -59,7 +60,7 @@ Chilon Recall 可将你自己的文本资料转换为私有、来源可追溯的
 使用已发布且固定版本的 npm package，只需一条命令即可创建私有配置并安装独立 Python engine：
 
 ```powershell
-npx -y chilon-recall@0.1.2 install C:\path\to\your\documents
+npx -y chilon-recall@0.1.3 install C:\path\to\your\documents
 ```
 
 托管 engine 保存在临时 npx cache 之外。可用 CHILON_RECALL_HOME 指定其他持久位置；升级 package 后再次运行 `setup`。
@@ -73,7 +74,7 @@ npx -y chilon-recall@0.1.2 install C:\path\to\your\documents
 ```powershell
 $env:RAG_MANAGER_CONFIG = "C:\path\to\your\documents\chilon-recall.json"
 $env:RAG_API_KEY = "your-provider-key"
-npx -y chilon-recall@0.1.2 doctor
+npx -y chilon-recall@0.1.3 doctor
 ```
 
 如果你通过 npm 安装，现在可以直接前往 [连接 MCP 客户端](#连接-mcp-客户端)。以下内容面向源码 checkout 或需要自定义配置的用户。
@@ -106,7 +107,7 @@ export CHILON_RECALL_PYTHON="$PWD/.venv/bin/python"
 npm start
 ```
 
-服务器使用 `stdio`，通常由 MCP 客户端启动，而不是作为交互式命令行程序独立使用。连接后先调用 `rag_status`，再预览 `rag_build`，最后携带返回的确认 token 执行建库。
+服务器使用 `stdio`，通常由 MCP 客户端启动，而不是作为交互式命令行程序独立使用。连接后先调用 `rag_status`，再预览 `rag_build`，最后携带返回的确认 token 执行建库。资料变更后请使用 `rag_sync` 刷新，而不是重新建库；未变更文件会复用已有向量。
 
 ## 连接 MCP 客户端
 
@@ -126,12 +127,12 @@ tool_timeout_sec = 1800
 default_tools_approval_mode = "writes"
 ```
 
-对于 npm 已发布版本，请改用固定版本的 npx 命令。先在同一操作系统账户下运行 npx -y chilon-recall@0.1.2 setup；固定版本可避免 package 意外升级改变已正常工作的 MCP server。
+对于 npm 已发布版本，请改用固定版本的 npx 命令。先在同一操作系统账户下运行 npx -y chilon-recall@0.1.3 setup；固定版本可避免 package 意外升级改变已正常工作的 MCP server。
 
 ```toml
 [mcp_servers.chilon-recall]
 command = "npx"
-args = ["-y", "chilon-recall@0.1.2", "mcp"]
+args = ["-y", "chilon-recall@0.1.3", "mcp"]
 env_vars = ["RAG_MANAGER_CONFIG", "RAG_API_KEY", "RAG_RERANK_API_KEY"]
 startup_timeout_sec = 15
 tool_timeout_sec = 1800
@@ -190,7 +191,7 @@ bundle 会在 `CHILON_RECALL_ROOT` 中运行 `node scripts/cli.mjs mcp`。如果
 
 ```json
 "command": "npx",
-"args": ["-y", "chilon-recall@0.1.2", "mcp"]
+"args": ["-y", "chilon-recall@0.1.3", "mcp"]
 ```
 
 应在 Claude Desktop 能继承的系统环境中设置 `RAG_API_KEY`；若操作系统无法提供，只能把它加入你本机的私有客户端配置。Claude Desktop 会把 `env` 值保存在本地 JSON 中，因此请限制文件权限，且绝不能提交该配置。Windows 用户应指向虚拟环境中的 `python.exe`。
@@ -230,7 +231,7 @@ Node.js MCP host 负责配置验证、资料发现、确认 token、路径安全
 配置和索引工具：
 
 - `rag_save_config` 仅修改 schema 允许的非敏感字段，并备份原 JSON。
-- `rag_build`、`rag_clear_index`、`rag_restore_index` 必须先使用 `action: "preview"`。预览会返回与当前配置、来源和索引状态绑定的短期 token，再用 `action: "execute"` 执行一次。
+- `rag_build`、`rag_sync`、`rag_clear_index`、`rag_restore_index` 必须先使用 `action: "preview"`。预览会返回与当前配置、来源和索引状态绑定的短期 token，再用 `action: "execute"` 执行一次。`rag_sync` 通过文件哈希复用兼容的未变更向量，并同步新增、修改和删除；索引设置变化或旧 manifest 缺少必需哈希时会自动回退到全量重建。
 
 ## Provider 配置
 
@@ -261,15 +262,14 @@ npm audit --audit-level=high
 
 ## 已知限制
 
-- v0.1.2 只索引 UTF-8 `.md`、`.txt`、`.rst`、`.csv`。PDF 应先转换为经过核对的文本，扫描版需 OCR。
+- v0.1.3 只索引 UTF-8 `.md`、`.txt`、`.rst`、`.csv`。PDF 应先转换为经过核对的文本，扫描版需 OCR。
 - 分块器识别 Markdown `#` 与 `##` 标题，尚未语义解析表格、引文或原生文档结构。
-- 当前为全量重建，不支持增量索引。
+- `rag_build` 保留为全量重建入口；`rag_sync` 使用内容哈希做增量同步，并在 staging 中重建 FAISS，以保持行 ID 与元数据严格对齐。
 - 首版不内置本地 embedding/reranker 模型。
 - 检索结果只是证据候选，不能证明资料集合完整、最新、正确或内部一致。
 
 ## 路线图
 
-- 基于内容哈希的增量索引
 - 带覆盖报告的 PDF 提取/OCR adapter
 - 本地 embedding 与 reranking provider
 - 来源过滤和 collection namespace

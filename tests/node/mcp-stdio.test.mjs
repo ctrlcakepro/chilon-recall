@@ -80,7 +80,7 @@ test("stdio MCP discovers tools and invokes rag_status", async () => {
     env,
     stderr: "pipe"
   });
-  const client = new Client({ name: "chilon-recall-test", version: "0.1.2" });
+  const client = new Client({ name: "chilon-recall-test", version: "0.1.3" });
   try {
     await client.connect(transport);
     const listed = await client.listTools();
@@ -89,6 +89,7 @@ test("stdio MCP discovers tools and invokes rag_status", async () => {
       "rag_status",
       "rag_query",
       "rag_build",
+      "rag_sync",
       "rag_clear_index",
       "rag_list_backups",
       "rag_restore_index",
@@ -115,6 +116,14 @@ test("stdio MCP discovers tools and invokes rag_status", async () => {
     });
     assert.equal(built.structuredContent.built, true);
     assert.ok(built.structuredContent.vector_count > 0);
+
+    const syncPreview = await client.callTool({ name: "rag_sync", arguments: { action: "preview" } });
+    const synced = await client.callTool({
+      name: "rag_sync",
+      arguments: { action: "execute", confirmationToken: syncPreview.structuredContent.confirmationToken }
+    });
+    assert.equal(synced.structuredContent.built, true);
+    assert.equal(synced.structuredContent.sync.mode, "incremental");
 
     const query = await client.callTool({
       name: "rag_query",

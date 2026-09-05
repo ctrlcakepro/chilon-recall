@@ -14,7 +14,7 @@ import {
   writeConfigAtomically
 } from "./config.mjs";
 import { ConfirmationStore, fingerprint } from "./confirmations.mjs";
-import { buildIndex, queryIndex } from "./engine.mjs";
+import { buildIndex, queryIndex, syncIndex } from "./engine.mjs";
 import { collectSourceFiles, pathExists, presentFile } from "./files.mjs";
 import {
   buildWithSwap,
@@ -90,7 +90,7 @@ function studyPacket(mode, task, question, retrieval, sections, notes) {
 export function createChilonRecallServer({ configPath = resolveConfigPath(), confirmations } = {}) {
   const confirmationStore = confirmations || new ConfirmationStore();
   const server = new McpServer(
-    { name: "chilon-recall", version: "0.1.2" },
+    { name: "chilon-recall", version: "0.1.3" },
     {
       instructions:
         "Chilon Recall is a local, source-backed knowledge engine. Check rag_status before build or recovery work. Prefer read-only retrieval tools. rag_build, rag_clear_index, and rag_restore_index require a preview followed by a matching confirmation token; never bypass that sequence. Report source paths and evidence limits, and do not claim that retrieved text proves more than it contains."
@@ -211,6 +211,40 @@ export function createChilonRecallServer({ configPath = resolveConfigPath(), con
       }
       confirmationStore.consume(confirmationToken, "build", currentFingerprint);
       return textAndStructured(await buildWithSwap(config, buildIndex));
+    })
+  );
+
+  server.registerTool(
+    "rag_sync",
+    {
+      title: "Synchronize Knowledge Index",
+      description:
+        "Preview or execute a staged content-hash sync. Unchanged files reuse existing vectors; added, modified, and deleted files are reconciled safely.",
+      inputSchema: {
+        action: z.enum(["preview", "execute"]).default("preview"),
+        confirmationToken: z.string().optional()
+      },
+      annotations: destructive
+    },
+    protectedHandler(async ({ action = "preview", confirmationToken }) => {
+      const config = await load();
+      const files = await collectSourceFiles(config);
+      const currentFingerprint = await operationState(config, { action: "sync" });
+      if (action === "preview") {
+        const confirmation = confirmationStore.issue("sync", currentFingerprint);
+        return textAndStructured({
+          action: "preview",
+          source_file_count: files.length,
+          source_bytes: files.reduce((sum, file) => sum + file.size, 0),
+          replaces_existing_index: await pathExists(config.indexDir),
+          target: publicTarget(config, config.indexDir),
+          safety:
+            "The synchronized index is built in staging. Unchanged vectors are reused only when the existing manifest and indexing settings are compatible; otherwise a full rebuild is used.",
+          ...confirmation
+        });
+      }
+      confirmationStore.consume(confirmationToken, "sync", currentFingerprint);
+      return textAndStructured(await buildWithSwap(config, syncIndex));
     })
   );
 
