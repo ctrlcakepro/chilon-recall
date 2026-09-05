@@ -44,9 +44,9 @@ It is an independent retrieval companion in the [Chilon Knowledge Work Harness](
    npx -y chilon-recall@0.1.3 doctor
    ```
 
-3. **Connect one client / 连接一个客户端。** Start with [Codex](#codex--codex-配置) or [Claude Desktop](#claude-desktop--claude-desktop-配置). The client starts the local server for you; you do not need to keep a separate terminal open.
+3. **Connect one client / 连接一个客户端。** Start with [Codex](#codex--codex-配置), [Claude Desktop](#claude-desktop--claude-desktop-配置), or [Qoder](#qoder--qoder-配置). The client starts the local server for you; you do not need to keep a separate terminal open.
 
-   **从 [Codex](#codex--codex-配置) 或 [Claude Desktop](#claude-desktop--claude-desktop-配置) 开始即可。** 客户端会替你启动本地 server，无需另开终端长期运行。
+   **从 [Codex](#codex--codex-配置)、[Claude Desktop](#claude-desktop--claude-desktop-配置) 或 [Qoder](#qoder--qoder-配置) 开始即可。** 客户端会替你启动本地 server，无需另开终端长期运行。
 
 ## Why Chilon Recall? / 为什么使用 Chilon Recall？
 
@@ -58,8 +58,8 @@ It is an independent retrieval companion in the [Chilon Knowledge Work Harness](
 - **本地优先控制**——文档和 FAISS 索引保留在你的设备上；只有发送给自选 embedding/reranking provider 的文本会离开设备。
 - **Safe operations** — builds happen in staging; clear and restore actions use previews, short-lived confirmation tokens, and recoverable backups.
 - **安全操作**——建库在 staging 目录中完成；清理和恢复使用预览、短期确认 token 与可恢复备份。
-- **MCP portability** — one `stdio` server works with Codex, Claude Desktop, and other MCP-compatible local clients.
-- **MCP 可移植性**——同一个 `stdio` server 可用于 Codex、Claude Desktop 及其他兼容的本地客户端。
+- **MCP portability** — one `stdio` server works with Codex, Claude Desktop, Qoder, and other MCP-compatible local clients.
+- **MCP 可移植性**——同一个 `stdio` server 可用于 Codex、Claude Desktop、Qoder 及其他兼容的本地客户端。
 
 ## Built for learning and knowledge work / 为学习与知识工作而设计
 
@@ -268,6 +268,45 @@ For an npm release, replace command and args with the following and omit CHILON_
 Set `RAG_API_KEY` in the environment inherited by Claude Desktop, or add it only to your private local client configuration when your operating system cannot provide it. Claude Desktop stores `env` values in a local JSON file, so restrict file permissions and never commit that file. On Windows, use the virtual environment's `python.exe` path.
 
 应在 Claude Desktop 可继承的系统环境中设置 `RAG_API_KEY`；若操作系统无法提供，只能把它加入本机私有 client 配置。Claude Desktop 会将 `env` 值存入本地 JSON，因此应限制文件权限，且绝不能提交该文件。Windows 用户应指向虚拟环境中的 `python.exe`。
+
+### Qoder / Qoder 配置
+
+Qoder IDE loads MCP servers from its own settings, and project-level skills and rules from the `.qoder/` directory. Generate all three from a checkout or an npm install:
+
+Qoder IDE 从自身设置中加载 MCP server，并从项目内的 `.qoder/` 目录加载项目级 skills 与 rules。可用一条命令生成这三部分：
+
+```powershell
+npx -y chilon-recall@0.1.3 qoder C:\path\to\your\project
+```
+
+This writes `.qoder/mcp.json`, `.qoder/skills/<name>/SKILL.md` for every bundled skill, and `.qoder/rules/chilon-recall.md`. Add `--force` to regenerate over existing files.
+
+该命令会写入 `.qoder/mcp.json`、每个内置 skill 对应的 `.qoder/skills/<name>/SKILL.md`，以及 `.qoder/rules/chilon-recall.md`。若要覆盖已有文件，请加 `--force`。
+
+Qoder does not read `.qoder/mcp.json` automatically; it is a shareable snippet. Open **Qoder IDE Settings → MCP → My Servers → + Add**, paste its contents, and replace the `RAG_MANAGER_CONFIG` placeholder with your private configuration path:
+
+Qoder 不会自动读取 `.qoder/mcp.json`，它只是一份可共享的配置片段。请打开 **Qoder IDE Settings → MCP → My Servers → + Add**，粘贴其内容，并把 `RAG_MANAGER_CONFIG` 占位符替换为你的私有配置路径：
+
+```json
+{
+  "mcpServers": {
+    "chilon-recall": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/chilon-recall/scripts/cli.mjs",
+        "mcp"
+      ],
+      "env": {
+        "RAG_MANAGER_CONFIG": "<absolute path to your private chilon-recall.json>"
+      }
+    }
+  }
+}
+```
+
+Set `RAG_API_KEY` (and `RAG_RERANK_API_KEY` when reranking is enabled) in the environment Qoder inherits. The generated files are safe to commit; credentials never belong in them. Restart Qoder IDE so the generated skills and rules load, then confirm the tools under **My Servers**.
+
+请在 Qoder 可继承的系统环境中设置 `RAG_API_KEY`（启用 reranking 时还需 `RAG_RERANK_API_KEY`）。生成的文件可以提交到版本库，其中绝不应写入凭据。重启 Qoder IDE 以加载生成的 skills 与 rules，并在 **My Servers** 中确认工具已出现。
 
 ## How it works / 工作原理
 
