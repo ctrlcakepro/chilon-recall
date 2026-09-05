@@ -90,7 +90,7 @@ function studyPacket(mode, task, question, retrieval, sections, notes) {
 export function createChilonRecallServer({ configPath = resolveConfigPath(), confirmations } = {}) {
   const confirmationStore = confirmations || new ConfirmationStore();
   const server = new McpServer(
-    { name: "chilon-recall", version: "0.1.2" },
+    { name: "chilon-recall", version: "0.1.3" },
     {
       instructions:
         "Chilon Recall is a local, source-backed knowledge engine. Check rag_status before build or recovery work. Prefer read-only retrieval tools. rag_build, rag_clear_index, and rag_restore_index require a preview followed by a matching confirmation token; never bypass that sequence. Report source paths and evidence limits, and do not claim that retrieved text proves more than it contains."

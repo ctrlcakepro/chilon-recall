@@ -31,7 +31,7 @@ It is an independent retrieval companion in the [Chilon Knowledge Work Harness](
    **运行一次下面的命令。** 它会创建私有配置与受管 Python engine；不会把 API key 写入 package 或配置文件。
 
    ```powershell
-   npx -y chilon-recall@0.1.2 install C:\path\to\your\documents
+   npx -y chilon-recall@0.1.3 install C:\path\to\your\documents
    ```
 
 2. **Set your provider key / 设置 provider key。** Open the generated `chilon-recall.json` to choose the provider endpoint and model, then set the key only in your environment. Run `doctor` to confirm the setup.
@@ -41,7 +41,7 @@ It is an independent retrieval companion in the [Chilon Knowledge Work Harness](
    ```powershell
    $env:RAG_MANAGER_CONFIG = "C:\path\to\your\documents\chilon-recall.json"
    $env:RAG_API_KEY = "your-provider-key"
-   npx -y chilon-recall@0.1.2 doctor
+   npx -y chilon-recall@0.1.3 doctor
    ```
 
 3. **Connect one client / 连接一个客户端。** Start with [Codex](#codex--codex-配置) or [Claude Desktop](#claude-desktop--claude-desktop-配置). The client starts the local server for you; you do not need to keep a separate terminal open.
@@ -92,7 +92,7 @@ Use the published, pinned npm release to create a private configuration and inst
 使用已发布且固定版本的 npm package，只需一条命令即可创建私有配置并安装独立 Python engine：
 
 ```powershell
-npx -y chilon-recall@0.1.2 install C:\path\to\your\documents
+npx -y chilon-recall@0.1.3 install C:\path\to\your\documents
 ```
 
 The managed engine lives outside the temporary npx cache. Use CHILON_RECALL_HOME to choose a different persistent location, and run `setup` after upgrading the package.
@@ -114,7 +114,7 @@ To validate the runtime and private configuration, set RAG_MANAGER_CONFIG and th
 ```powershell
 $env:RAG_MANAGER_CONFIG = "C:\path\to\your\documents\chilon-recall.json"
 $env:RAG_API_KEY = "your-provider-key"
-npx -y chilon-recall@0.1.2 doctor
+npx -y chilon-recall@0.1.3 doctor
 ```
 
 If you installed from npm, you can now skip to [Connect an MCP client](#connect-an-mcp-client--连接-mcp-客户端). The remaining setup details are for source checkouts or custom configurations.
@@ -179,14 +179,14 @@ tool_timeout_sec = 1800
 default_tools_approval_mode = "writes"
 ```
 
-For an npm release, use a pinned npx command instead. Run npx -y chilon-recall@0.1.2 setup first under the same OS account. A pinned version prevents an unexpected package upgrade from changing a working MCP server.
+For an npm release, use a pinned npx command instead. Run npx -y chilon-recall@0.1.3 setup first under the same OS account. A pinned version prevents an unexpected package upgrade from changing a working MCP server.
 
-对于 npm 已发布版本，请改用固定版本的 npx 命令。先在同一操作系统账户下运行 npx -y chilon-recall@0.1.2 setup；固定版本可避免 package 意外升级改变已正常工作的 MCP server。
+对于 npm 已发布版本，请改用固定版本的 npx 命令。先在同一操作系统账户下运行 npx -y chilon-recall@0.1.3 setup；固定版本可避免 package 意外升级改变已正常工作的 MCP server。
 
 ```toml
 [mcp_servers.chilon-recall]
 command = "npx"
-args = ["-y", "chilon-recall@0.1.2", "mcp"]
+args = ["-y", "chilon-recall@0.1.3", "mcp"]
 env_vars = ["RAG_MANAGER_CONFIG", "RAG_API_KEY", "RAG_RERANK_API_KEY"]
 startup_timeout_sec = 15
 tool_timeout_sec = 1800
@@ -261,7 +261,7 @@ For an npm release, replace command and args with the following and omit CHILON_
 
 ```json
 "command": "npx",
-"args": ["-y", "chilon-recall@0.1.2", "mcp"]
+"args": ["-y", "chilon-recall@0.1.3", "mcp"]
 ```
 
 Set `RAG_API_KEY` in the environment inherited by Claude Desktop, or add it only to your private local client configuration when your operating system cannot provide it. Claude Desktop stores `env` values in a local JSON file, so restrict file permissions and never commit that file. On Windows, use the virtual environment's `python.exe` path.
@@ -392,8 +392,8 @@ The publication check rejects likely secrets, personal email addresses, and user
 
 ## Limits / 已知限制
 
-- Version 0.1.2 indexes UTF-8 `.md`, `.txt`, `.rst`, and `.csv` text. Convert PDFs to reviewed text first; scanned PDFs need OCR.
-- v0.1.2 只索引 UTF-8 `.md`、`.txt`、`.rst` 和 `.csv` 文本。PDF 应先转换为经过核对的文本；扫描版 PDF 需要 OCR。
+- Version 0.1.3 indexes UTF-8 `.md`, `.txt`, `.rst`, and `.csv` text. Convert PDFs to reviewed text first; scanned PDFs need OCR.
+- v0.1.3 只索引 UTF-8 `.md`、`.txt`、`.rst` 和 `.csv` 文本。PDF 应先转换为经过核对的文本；扫描版 PDF 需要 OCR。
 - The included chunker recognizes Markdown `#` and `##` headings. It does not yet parse tables, citations, or document-native structure semantically.
 - 内置 chunker 识别 Markdown `#` 和 `##` headings，暂时不会从语义上解析表格、引文或原生文档结构。
 - `rag_build` is a deliberate full rebuild. Use `rag_sync` for content-hash incremental synchronization; it always writes a new staged FAISS index so row IDs remain aligned with metadata.
