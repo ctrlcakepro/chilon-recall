@@ -230,7 +230,7 @@ Node.js MCP host 负责配置验证、资料发现、确认 token、路径安全
 配置和索引工具：
 
 - `rag_save_config` 仅修改 schema 允许的非敏感字段，并备份原 JSON。
-- `rag_build`、`rag_clear_index`、`rag_restore_index` 必须先使用 `action: "preview"`。预览会返回与当前配置、来源和索引状态绑定的短期 token，再用 `action: "execute"` 执行一次。
+- `rag_build`、`rag_sync`、`rag_clear_index`、`rag_restore_index` 必须先使用 `action: "preview"`。预览会返回与当前配置、来源和索引状态绑定的短期 token，再用 `action: "execute"` 执行一次。`rag_sync` 通过文件哈希复用兼容的未变更向量，并同步新增、修改和删除；索引设置变化或旧 manifest 缺少必需哈希时会自动回退到全量重建。
 
 ## Provider 配置
 
@@ -263,13 +263,12 @@ npm audit --audit-level=high
 
 - v0.1.2 只索引 UTF-8 `.md`、`.txt`、`.rst`、`.csv`。PDF 应先转换为经过核对的文本，扫描版需 OCR。
 - 分块器识别 Markdown `#` 与 `##` 标题，尚未语义解析表格、引文或原生文档结构。
-- 当前为全量重建，不支持增量索引。
+- `rag_build` 保留为全量重建入口；`rag_sync` 使用内容哈希做增量同步，并在 staging 中重建 FAISS，以保持行 ID 与元数据严格对齐。
 - 首版不内置本地 embedding/reranker 模型。
 - 检索结果只是证据候选，不能证明资料集合完整、最新、正确或内部一致。
 
 ## 路线图
 
-- 基于内容哈希的增量索引
 - 带覆盖报告的 PDF 提取/OCR adapter
 - 本地 embedding 与 reranking provider
 - 来源过滤和 collection namespace

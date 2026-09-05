@@ -325,8 +325,8 @@ Configuration and index tools:
 
 - `rag_save_config` updates only schema-approved, non-secret fields and creates a backup of the JSON file.
 - `rag_save_config` 仅修改 schema 允许的非敏感字段，并创建 JSON 文件备份。
-- `rag_build`, `rag_clear_index`, and `rag_restore_index` require `action: "preview"` first. The preview returns a short-lived token bound to the current configuration and source/index state. Use that token once with `action: "execute"`.
-- `rag_build`、`rag_clear_index` 与 `rag_restore_index` 必须先使用 `action: "preview"`。预览会返回一个绑定当前配置和来源/索引状态的短期 token，再使用该 token 一次性执行 `action: "execute"`。
+- `rag_build`, `rag_sync`, `rag_clear_index`, and `rag_restore_index` require `action: "preview"` first. The preview returns a short-lived token bound to the current configuration and source/index state. `rag_sync` hashes files, reuses compatible unchanged vectors, and reconciles added, modified, and deleted files; it falls back to a full rebuild when indexing settings change or an older manifest lacks the required hashes.
+- `rag_build`、`rag_sync`、`rag_clear_index` 与 `rag_restore_index` 必须先使用 `action: "preview"`。预览会返回一个绑定当前配置和来源/索引状态的短期 token。`rag_sync` 对文件进行哈希，复用兼容的未变更向量，并同步新增、修改和删除；索引设置变化或旧 manifest 缺少所需哈希时会回退为全量重建。
 
 ## Provider configuration / Provider 配置
 
@@ -396,8 +396,8 @@ The publication check rejects likely secrets, personal email addresses, and user
 - v0.1.2 只索引 UTF-8 `.md`、`.txt`、`.rst` 和 `.csv` 文本。PDF 应先转换为经过核对的文本；扫描版 PDF 需要 OCR。
 - The included chunker recognizes Markdown `#` and `##` headings. It does not yet parse tables, citations, or document-native structure semantically.
 - 内置 chunker 识别 Markdown `#` 和 `##` headings，暂时不会从语义上解析表格、引文或原生文档结构。
-- Rebuilding is full-index, not incremental.
-- 当前建库是全量重建，不是增量索引。
+- `rag_build` is a deliberate full rebuild. Use `rag_sync` for content-hash incremental synchronization; it always writes a new staged FAISS index so row IDs remain aligned with metadata.
+- `rag_build` 是明确的全量重建入口。内容哈希增量同步请使用 `rag_sync`；它始终在 staging 中写出新的 FAISS 索引，以保证行 ID 与元数据对齐。
 - Local embedding and reranker models are not bundled in the first release.
 - 首版不内置本地 embedding 和 reranker 模型。
 - Retrieval returns evidence candidates; it does not prove that the collection is complete, current, correct, or internally consistent.
@@ -405,8 +405,6 @@ The publication check rejects likely secrets, personal email addresses, and user
 
 ## Roadmap / 路线图
 
-- Incremental indexing and content hashing
-- 基于内容哈希的增量索引
 - First-class PDF extraction/OCR adapters with coverage reports
 - 带覆盖报告的 PDF 提取/OCR adapter
 - Local embedding and reranking providers

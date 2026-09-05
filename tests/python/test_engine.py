@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import sys
 import tempfile
 import threading
@@ -14,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "python"))
 
 from chilon_recall.config import ConfigError, load_config
 from chilon_recall.documents import chunk_document
-from chilon_recall.indexing import build_index, query_index
+from chilon_recall.indexing import build_index, embed_texts, query_index, sync_index
 
 
 def vector(text: str) -> list[float]:
@@ -155,6 +156,36 @@ class EngineIntegrationTests(unittest.TestCase):
         self.assertEqual(first["file"], "notes.md")
         self.assertIn("score_vector", first)
         self.assertIn("score_rerank", first)
+
+    def test_incremental_sync_reuses_unchanged_vectors_and_reconciles_changes(self) -> None:
+        config = load_config(self.config_path)
+        output = self.rag / "faiss_db"
+
+        def promote(staging: Path) -> None:
+            shutil.rmtree(output)
+            shutil.move(str(staging), str(output))
+
+        with patch.dict(os.environ, {"RAG_API_KEY": "mock-key", "RAG_RERANK_API_KEY": "mock-key"}):
+            build_index(config, output)
+            with patch("chilon_recall.indexing.embed_texts", wraps=embed_texts) as mocked_embed:
+                no_change = sync_index(config, self.rag / "no-change")
+            self.assertEqual(mocked_embed.call_count, 0)
+            self.assertEqual(no_change["sync"]["mode"], "incremental")
+            self.assertGreater(no_change["sync"]["reused_vectors"], 0)
+            promote(self.rag / "no-change")
+
+            (self.project / "notes.md").write_text("# Changed\n\nA changed source now discusses spaced evidence review.", encoding="utf-8")
+            (self.project / "addition.md").write_text("# Addition\n\nA separate source introduces triangulation for recall.", encoding="utf-8")
+            changed = sync_index(config, self.rag / "changed")
+            self.assertEqual(changed["sync"]["added_files"], 1)
+            self.assertEqual(changed["sync"]["modified_files"], 1)
+            promote(self.rag / "changed")
+
+            (self.project / "notes.md").unlink()
+            deleted = sync_index(config, self.rag / "deleted")
+        metadata = json.loads((self.rag / "deleted" / "meta.json").read_text(encoding="utf-8"))
+        self.assertEqual(deleted["sync"]["deleted_files"], 1)
+        self.assertEqual({row["file"] for row in metadata}, {"addition.md"})
 
     def test_config_rejects_inline_secret(self) -> None:
         payload = json.loads(self.config_path.read_text(encoding="utf-8"))
