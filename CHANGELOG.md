@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.3] - 2026-09-05
+
+- Add `rag_sync`: a staged, content-hash incremental synchronization of the knowledge index. Unchanged files reuse their existing vectors; added, modified, and deleted files are reconciled.
+- Record a version 2 index manifest with per-file SHA-256 source hashes and the indexing settings the vectors were produced under.
+- Fall back to a full rebuild when indexing settings change, when an older manifest lacks the hashes, or when existing metadata is not covered by its manifest.
+- Keep `rag_build` as the deliberate full-rebuild entry point; both paths use the same preview/execute confirmation and staged index swap.
+
 ## [0.1.2] - 2026-08-26
 
 - Normalize file and project paths before deriving relative source paths, fixing Windows 8.3 short-path and long-path mismatches.
