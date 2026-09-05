@@ -74,6 +74,7 @@ Chilon Recall 同时支持直接检索和可复用的学习工作流：
 | Distinguish two ideas or methods<br>区分两个概念或方法 | `concept_compare` | Evidence for a comparison table<br>适合整理比较表的证据 |
 | Turn a chapter into structured notes<br>将章节转为结构化笔记 | `chapter_summary` | Broad summary evidence and coverage cautions<br>章节总结证据与覆盖提醒 |
 | Prepare for review or an exam<br>复习或备考 | `review_outline` | Concepts, relationships, confusions, and practice prompts<br>概念、联系、易混点与练习提示 |
+| Refresh the index after documents change<br>资料变更后刷新索引 | `rag_sync` | Added, modified, deleted, and unchanged file counts with reused and re-embedded vector counts<br>新增、修改、删除、未变更的文件数，以及复用与重新嵌入的向量数 |
 
 The bundled synthetic demo material covers retrieval practice, spaced review, evidence boundaries, and research triangulation. It is safe to redistribute and contains no private or copyrighted textbook content.
 
@@ -153,9 +154,9 @@ export CHILON_RECALL_PYTHON="$PWD/.venv/bin/python"
 npm start
 ```
 
-The server uses `stdio`, so it normally runs under an MCP client rather than in a standalone interactive terminal. Connect it, call `rag_status`, preview `rag_build`, and execute the build with the returned confirmation token.
+The server uses `stdio`, so it normally runs under an MCP client rather than in a standalone interactive terminal. Connect it, call `rag_status`, preview `rag_build`, and execute the build with the returned confirmation token. After documents change, refresh with `rag_sync` instead of rebuilding; it reuses vectors for unchanged files.
 
-server 使用 `stdio`，因此通常由 MCP client 启动，而不是作为独立交互式终端运行。连接后，先调用 `rag_status`，预览 `rag_build`，再使用返回的 confirmation token 执行建库。
+server 使用 `stdio`，因此通常由 MCP client 启动，而不是作为独立交互式终端运行。连接后，先调用 `rag_status`，预览 `rag_build`，再使用返回的 confirmation token 执行建库。资料发生变更后，请用 `rag_sync` 刷新而不是重建；未变更文件会复用已有向量。
 
 ## Connect an MCP client / 连接 MCP client
 

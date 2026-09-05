@@ -47,6 +47,7 @@ Chilon Recall 可将你自己的文本资料转换为私有、来源可追溯的
 | 区分两个概念或方法 | `concept_compare` | 适合比较表的证据 |
 | 把章节整理成结构化笔记 | `chapter_summary` | 章节总结证据与覆盖提醒 |
 | 复习或备考 | `review_outline` | 概念、联系、易混点和练习题 |
+| 资料变更后刷新索引 | `rag_sync` | 新增、修改、删除、未变更的文件数，以及复用与重新嵌入的向量数 |
 
 仓库中的示例资料完全为合成内容，不包含真实教材、个人笔记或私有索引。
 
@@ -106,7 +107,7 @@ export CHILON_RECALL_PYTHON="$PWD/.venv/bin/python"
 npm start
 ```
 
-服务器使用 `stdio`，通常由 MCP 客户端启动，而不是作为交互式命令行程序独立使用。连接后先调用 `rag_status`，再预览 `rag_build`，最后携带返回的确认 token 执行建库。
+服务器使用 `stdio`，通常由 MCP 客户端启动，而不是作为交互式命令行程序独立使用。连接后先调用 `rag_status`，再预览 `rag_build`，最后携带返回的确认 token 执行建库。资料变更后请使用 `rag_sync` 刷新，而不是重新建库；未变更文件会复用已有向量。
 
 ## 连接 MCP 客户端
 
