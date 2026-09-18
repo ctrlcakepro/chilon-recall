@@ -5,7 +5,7 @@ import path from "node:path";
 import test from "node:test";
 
 import { initializeConfig, installProject } from "../../scripts/cli.mjs";
-import { parsePythonVersion, runtimeHome, supportsPython, venvDir, venvPython } from "../../src/runtime.mjs";
+import { parsePythonVersion, runProcess, runtimeHome, supportsPython, venvDir, venvPython } from "../../src/runtime.mjs";
 
 test("runtime paths respect platform defaults and explicit overrides", () => {
   const windows = { env: { LOCALAPPDATA: "C:\\Local" }, platform: "win32", home: "C:\\Users\\Demo" };
@@ -52,4 +52,38 @@ test("install does not create a configuration when engine setup fails", async ()
   const directory = path.join(os.tmpdir(), `chilon-install-fail-${process.pid}-${Date.now()}`);
   await assert.rejects(installProject(directory, { setup: async () => { throw new Error("engine setup failed"); } }), /engine setup failed/);
   await assert.rejects(fs.access(directory), /ENOENT/);
+});
+
+test("install forwards progress callbacks to the injected setup function", async () => {
+  // Regression: engine setup (venv + pip install) can run silently for the better
+  // part of a minute; installProject must pass onProgress/onOutput through to
+  // setupEngine so the CLI can surface live progress instead of looking hung.
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), "chilon-install-progress-"));
+  let receivedOptions;
+  const onProgress = () => {};
+  const onOutput = () => {};
+  await installProject(directory, {
+    setup: async (options) => {
+      receivedOptions = options;
+      return { python: "managed-python" };
+    },
+    onProgress,
+    onOutput
+  });
+  assert.equal(receivedOptions.onProgress, onProgress);
+  assert.equal(receivedOptions.onOutput, onOutput);
+  await fs.rm(directory, { recursive: true, force: true });
+});
+
+test("runProcess streams output live via onOutput in addition to buffering it", async () => {
+  const chunks = [];
+  const result = await runProcess(
+    process.execPath,
+    ["-e", "process.stdout.write('hello '); process.stderr.write('world');"],
+    { onOutput: (chunk) => chunks.push(chunk) }
+  );
+  assert.equal(result.stdout, "hello ");
+  assert.equal(result.stderr, "world");
+  // stdout/stderr are independent streams, so don't assume arrival order.
+  assert.deepEqual(chunks.sort(), ["hello ", "world"]);
 });

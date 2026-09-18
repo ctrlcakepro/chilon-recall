@@ -12,11 +12,21 @@ def _headers(api_key: str) -> dict[str, str]:
     return {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
 
 
+def _join_endpoint(base_url: str, suffix: str) -> str:
+    trimmed = base_url.rstrip("/")
+    # base_url is documented as the provider's OpenAI-compatible root (e.g. ".../v1"),
+    # but a config that already points at the full endpoint (e.g. ".../v1/embeddings",
+    # copied from provider docs) must not get the suffix appended a second time.
+    if trimmed.lower().endswith(suffix.lower()):
+        return trimmed
+    return trimmed + suffix
+
+
 def embed_texts(config: dict[str, Any], texts: list[str], *, document: bool) -> np.ndarray:
     settings = config["embedding"]
     prefix = settings.get("doc_prefix" if document else "query_prefix", "")
     inputs = [prefix + text for text in texts]
-    endpoint = settings["base_url"].rstrip("/") + "/embeddings"
+    endpoint = _join_endpoint(settings["base_url"], "/embeddings")
     with httpx.Client(timeout=60.0, trust_env=False) as client:
         response = client.post(
             endpoint,

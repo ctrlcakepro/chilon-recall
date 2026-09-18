@@ -47,7 +47,11 @@ export async function fileExists(target) {
   }
 }
 
-export function runProcess(command, args, { cwd = packageRoot, env = process.env, timeoutMs = 10 * 60 * 1000 } = {}) {
+export function runProcess(
+  command,
+  args,
+  { cwd = packageRoot, env = process.env, timeoutMs = 10 * 60 * 1000, onOutput } = {}
+) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd,
@@ -63,9 +67,11 @@ export function runProcess(command, args, { cwd = packageRoot, env = process.env
     }, timeoutMs);
     child.stdout.on("data", (chunk) => {
       stdout += chunk.toString("utf8");
+      onOutput?.(chunk.toString("utf8"));
     });
     child.stderr.on("data", (chunk) => {
       stderr += chunk.toString("utf8");
+      onOutput?.(chunk.toString("utf8"));
     });
     child.on("error", (error) => {
       clearTimeout(timer);
@@ -122,23 +128,34 @@ export async function resolveEnginePython(options = {}) {
 export async function setupEngine(options = {}) {
   const env = options.env || process.env;
   const root = options.packageRoot || packageRoot;
+  // Installing the engine downloads and builds faiss/numpy/httpx, which routinely
+  // takes the better part of a minute with no output of its own reaching the
+  // caller — it looks hung. onProgress announces each phase and onOutput (wired
+  // through to every runProcess call below via the `...options` spread) streams
+  // the underlying pip/venv output live, so callers can show real progress
+  // without touching this function's own return value or stdout contract.
+  const onProgress = options.onProgress || (() => {});
   const runtime = runtimeHome(options);
   const environment = venvDir(options);
   const enginePython = venvPython(options);
   const bootstrap = await findBootstrapPython({ ...options, env });
   await fs.mkdir(runtime, { recursive: true });
   if (!(await fileExists(enginePython))) {
+    onProgress("Creating a private Python virtual environment...");
     await runProcess(bootstrap.command, [...bootstrap.args, "-m", "venv", environment], { ...options, env });
   }
+  onProgress("Installing the engine and its dependencies (faiss, numpy, httpx) — this can take a minute...");
   await runProcess(
     enginePython,
     ["-m", "pip", "install", "--disable-pip-version-check", "--upgrade", path.resolve(root)],
     { ...options, env, timeoutMs: 20 * 60 * 1000 }
   );
+  onProgress("Verifying the installation...");
   await runProcess(enginePython, ["-c", "import faiss, httpx, numpy, chilon_recall; print('ok')"], {
     ...options,
     env
   });
+  onProgress("Engine ready.");
   return {
     runtime_home: runtime,
     python: enginePython,
