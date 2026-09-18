@@ -28,7 +28,7 @@ Chilon Recall 可将你自己的文本资料转换为私有、来源可追溯的
    npx -y chilon-recall@0.1.3 doctor
    ```
 
-3. **连接一个客户端。** 从 [Codex](#codex) 或 [Claude Desktop](#claude-desktop) 开始即可。客户端会替你启动本地 server，无需另开终端长期运行。
+3. **连接一个客户端。** 从 [Codex](#codex)、[Claude Desktop](#claude-desktop) 或 [Qoder](#qoder) 开始即可。客户端会替你启动本地 server，无需另开终端长期运行。
 
 ## 为什么使用 Chilon Recall？
 
@@ -36,7 +36,7 @@ Chilon Recall 可将你自己的文本资料转换为私有、来源可追溯的
 - **答案可追溯**：每条结果包含相对路径、标题层级、近似行号和检索分数。
 - **本地优先控制**：文档和 FAISS 索引留在本机；只有发送给自选 embedding/reranker 服务的文本会离开设备。
 - **安全索引操作**：新索引先在 staging 完成；清理和恢复需要预览、短期确认 token，并保留可恢复备份。
-- **跨 MCP 客户端**：同一 `stdio` MCP server 可用于 Codex、Claude Desktop 及其他兼容客户端。
+- **跨 MCP 客户端**：同一 `stdio` MCP server 可用于 Codex、Claude Desktop、Qoder 及其他兼容客户端。
 
 ## 面向学习与知识工作的能力
 
@@ -195,6 +195,37 @@ bundle 会在 `CHILON_RECALL_ROOT` 中运行 `node scripts/cli.mjs mcp`。如果
 ```
 
 应在 Claude Desktop 能继承的系统环境中设置 `RAG_API_KEY`；若操作系统无法提供，只能把它加入你本机的私有客户端配置。Claude Desktop 会把 `env` 值保存在本地 JSON 中，因此请限制文件权限，且绝不能提交该配置。Windows 用户应指向虚拟环境中的 `python.exe`。
+
+### Qoder
+
+Qoder IDE 从自身设置中加载 MCP server，并从项目内的 `.qoder/` 目录加载项目级 skills 与 rules。可用一条命令生成这三部分：
+
+```powershell
+npx -y chilon-recall@0.1.3 qoder C:\path\to\your\project
+```
+
+该命令会写入 `.qoder/mcp.json`、每个内置 skill 对应的 `.qoder/skills/<name>/SKILL.md`，以及 `.qoder/rules/chilon-recall.md`。若要覆盖已有文件，请加 `--force`。
+
+Qoder 不会自动读取 `.qoder/mcp.json`，它只是一份可共享的配置片段。请打开 **Qoder IDE Settings → MCP → My Servers → + Add**，粘贴其内容，并把 `RAG_MANAGER_CONFIG` 占位符替换为你的私有配置路径：
+
+```json
+{
+  "mcpServers": {
+    "chilon-recall": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/chilon-recall/scripts/cli.mjs",
+        "mcp"
+      ],
+      "env": {
+        "RAG_MANAGER_CONFIG": "<absolute path to your private chilon-recall.json>"
+      }
+    }
+  }
+}
+```
+
+请在 Qoder 可继承的系统环境中设置 `RAG_API_KEY`（启用 reranking 时还需 `RAG_RERANK_API_KEY`）。生成的文件可以提交到版本库，其中绝不应写入凭据。重启 Qoder IDE 以加载生成的 skills 与 rules，并在 **My Servers** 中确认工具已出现。
 
 ## 工作原理
 

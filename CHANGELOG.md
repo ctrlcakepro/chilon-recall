@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+- Add Qoder IDE compatibility: `chilon-recall qoder <directory>` generates `.qoder/mcp.json`, project-level skills, and a retrieval rule file from the bundled definitions.
+- Document the Qoder client setup in both READMEs; the generated files stay credential-free.
+
 ## [0.1.3] - 2026-09-05
 
 - Add `rag_sync`: a staged, content-hash incremental synchronization of the knowledge index. Unchanged files reuse their existing vectors; added, modified, and deleted files are reconciled.

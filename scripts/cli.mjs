@@ -15,6 +15,7 @@ import {
   setupEngine,
   venvPython
 } from "../src/runtime.mjs";
+import { installQoder } from "../src/qoder.mjs";
 import { startStdioServer } from "../src/server.mjs";
 
 const help = `Chilon Recall — local-first MCP knowledge retrieval
@@ -24,6 +25,8 @@ Usage:
                                       Create a private config and install the Python engine.
   chilon-recall init <directory> [--force]
                                       Create a private config in a document directory.
+  chilon-recall qoder <directory> [--force]
+                                      Generate the Qoder IDE surface (.qoder/mcp.json, skills, rules).
   chilon-recall setup       Create or update the isolated Python engine.
   chilon-recall doctor      Check Node, Python engine, and private configuration.
   chilon-recall mcp         Start the stdio MCP server (the default command).
@@ -171,6 +174,16 @@ export async function main(argv = process.argv.slice(2)) {
     }
     const configPath = await initializeConfig(directory, { force });
     writeJson({ config: configPath, next: "Set RAG_MANAGER_CONFIG to this path, then configure your provider environment variables." });
+    return 0;
+  }
+  if (command === "qoder") {
+    const args = argv.slice(1);
+    const force = args.includes("--force");
+    const positional = args.filter((arg) => arg !== "--force");
+    if (positional.length > 1) {
+      throw new Error("`qoder` accepts at most one project directory.");
+    }
+    writeJson(await installQoder(positional[0], { force }));
     return 0;
   }
   if (command === "doctor") return doctor();
