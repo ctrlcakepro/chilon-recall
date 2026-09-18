@@ -58,7 +58,15 @@ $env:RAG_API_KEY = "your-provider-key"
 npx -y chilon-recall@0.1.4 doctor
 ```
 
-不确定该填哪个 model？`chilon-recall key --base-url https://api.example.com/v1` 会提示你粘贴一次 key（终端隐藏输入），调用该 provider 自己的 `/models` 接口，推荐一个 embedding 和一个 reranker 模型，并打印出已经填好真实 key、可直接复制运行的 `$env:` / `setx` / `export` 命令。这个 key 只用于这一次请求，绝不会被写入任何文件。
+`doctor` 是离线检查：它能发现模板占位值和缺失的 key，但不会联系你的 provider，所以一个"看起来真实但拼错了一个字母"的 `base_url`，或者一个错误的 key，仍然会通过。接下来用 key 向导做一次在线确认：
+
+```powershell
+npx -y chilon-recall@0.1.4 key --base-url https://your-provider.example/v1
+```
+
+它会提示你粘贴一次 key（终端隐藏输入），调用该 provider 自己的 `/models` 接口——URL 拼错会在这一步直接报错，被 provider 拒绝的 key 也一样——推荐一个 embedding 和一个 reranker 模型，并打印出已经填好真实 key、可直接复制运行的 `$env:` / `setx` / `export` 命令。chilon-recall 只把这个 key 用于这一次请求，绝不写入任何文件；但打印出的 `setx` / `>> ~/.bashrc` 命令如果你执行了，会把 key 以明文存进注册表或 shell 配置文件。
+
+> **请把 key 作为单行粘贴。** 输入框在收到第一个换行时就会提交，粘贴内容中间的换行也算：换行之后的内容会被丢弃。如果剪贴板里不止 key 本身（例如复制了一段 `KEY=...` 配置），请只复制 key。
 
 ### 3. 连接一个客户端
 

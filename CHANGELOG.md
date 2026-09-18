@@ -10,6 +10,13 @@ All notable changes to this project will be documented in this file.
 - Fix `doctor` reporting `configuration.ready`/`credentials_ready: true` while `embedding.base_url`/`model` were still the install template's placeholder values.
 - Fix the CLI entrypoint always exiting `0`: `main()`'s return value (notably `doctor`'s pass/fail code) was never applied to `process.exitCode`, so scripted checks against the exit code always saw success.
 - Warn when `chilon-recall qoder` is run from an `npx` temporary cache: the generated `.qoder/mcp.json` embeds that ephemeral path, which breaks silently on the next cache clear or version bump.
+- Fix `chilon-recall key` hanging forever when the pasted key contained a newline: raw-mode stdin delivers a paste as one multi-character chunk, which was treated as a single unknown keystroke. Input is now processed per character, so a multi-line paste submits at its first line break and the rest is discarded.
+- Fix a header-unsafe key (for example one with an embedded newline) leaking in plaintext inside the error message and being misreported as a network failure. The key is now validated before any request, and redacted from any error that still surfaces.
+- Fix model recommendation suggesting a reranker (e.g. a `bge-reranker-*` model) as the embedding model; rerank matches are excluded from the embedding candidates first.
+- Fix a `base_url` that already ends with the endpoint suffix (e.g. `.../embeddings`) getting the suffix appended twice, in both the Python engine and the `key` model lookup.
+- Configuration validation errors (a typo'd key, a wrong type) are now reported as a readable sentence in MCP tool errors and `doctor`, instead of a raw JSON dump of the validation issues.
+- The first-run engine setup (virtual environment + `pip install`) now reports its progress and the underlying process output on stderr instead of running silently for up to a minute; stdout still carries only the single JSON result.
+- Document that the `key` wizard's `setx` / `>> ~/.bashrc` commands store the key in plaintext (registry / shell profile) if run, and that all printed commands remain in shell history and scrollback.
 
 ## [0.1.3] - 2026-09-18
 
