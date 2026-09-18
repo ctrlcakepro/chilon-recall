@@ -76,6 +76,13 @@ export function buildIndex(config, outputDir) {
   );
 }
 
+export function syncIndex(config, outputDir) {
+  return runEngine(
+    ["sync", "--config", config.configPath, "--output", outputDir],
+    { timeoutMs: 30 * 60 * 1000 }
+  );
+}
+
 export function queryIndex(config, question, { top, candidates } = {}) {
   const args = ["query", "--config", config.configPath, "--question", question];
   if (top !== undefined) args.push("--top", String(top));

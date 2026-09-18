@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 from .config import load_config
-from .indexing import build_index, query_index
+from .indexing import build_index, query_index, sync_index
 
 
 def _force_utf8() -> None:
@@ -23,6 +23,9 @@ def parser() -> argparse.ArgumentParser:
     build = commands.add_parser("build")
     build.add_argument("--config", required=True)
     build.add_argument("--output", required=True)
+    sync = commands.add_parser("sync")
+    sync.add_argument("--config", required=True)
+    sync.add_argument("--output", required=True)
     query = commands.add_parser("query")
     query.add_argument("--config", required=True)
     query.add_argument("--question", required=True)
@@ -38,6 +41,8 @@ def main(argv: list[str] | None = None) -> int:
         config = load_config(args.config)
         if args.command == "build":
             result = build_index(config, Path(args.output))
+        elif args.command == "sync":
+            result = sync_index(config, Path(args.output))
         else:
             result = query_index(config, args.question, top=args.top, candidates=args.candidates)
         print(json.dumps(result, ensure_ascii=False))
@@ -49,4 +54,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

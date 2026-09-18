@@ -31,7 +31,7 @@ It is an independent retrieval companion in the [Chilon Knowledge Work Harness](
    **运行一次下面的命令。** 它会创建私有配置与受管 Python engine；不会把 API key 写入 package 或配置文件。
 
    ```powershell
-   npx -y chilon-recall@0.1.2 install C:\path\to\your\documents
+   npx -y chilon-recall@0.1.3 install C:\path\to\your\documents
    ```
 
 2. **Set your provider key / 设置 provider key。** Open the generated `chilon-recall.json` to choose the provider endpoint and model, then set the key only in your environment. Run `doctor` to confirm the setup.
@@ -41,7 +41,7 @@ It is an independent retrieval companion in the [Chilon Knowledge Work Harness](
    ```powershell
    $env:RAG_MANAGER_CONFIG = "C:\path\to\your\documents\chilon-recall.json"
    $env:RAG_API_KEY = "your-provider-key"
-   npx -y chilon-recall@0.1.2 doctor
+   npx -y chilon-recall@0.1.3 doctor
    ```
 
 3. **Connect one client / 连接一个客户端。** Start with [Codex](#codex--codex-配置) or [Claude Desktop](#claude-desktop--claude-desktop-配置). The client starts the local server for you; you do not need to keep a separate terminal open.
@@ -74,6 +74,7 @@ Chilon Recall 同时支持直接检索和可复用的学习工作流：
 | Distinguish two ideas or methods<br>区分两个概念或方法 | `concept_compare` | Evidence for a comparison table<br>适合整理比较表的证据 |
 | Turn a chapter into structured notes<br>将章节转为结构化笔记 | `chapter_summary` | Broad summary evidence and coverage cautions<br>章节总结证据与覆盖提醒 |
 | Prepare for review or an exam<br>复习或备考 | `review_outline` | Concepts, relationships, confusions, and practice prompts<br>概念、联系、易混点与练习提示 |
+| Refresh the index after documents change<br>资料变更后刷新索引 | `rag_sync` | Added, modified, deleted, and unchanged file counts with reused and re-embedded vector counts<br>新增、修改、删除、未变更的文件数，以及复用与重新嵌入的向量数 |
 
 The bundled synthetic demo material covers retrieval practice, spaced review, evidence boundaries, and research triangulation. It is safe to redistribute and contains no private or copyrighted textbook content.
 
@@ -92,7 +93,7 @@ Use the published, pinned npm release to create a private configuration and inst
 使用已发布且固定版本的 npm package，只需一条命令即可创建私有配置并安装独立 Python engine：
 
 ```powershell
-npx -y chilon-recall@0.1.2 install C:\path\to\your\documents
+npx -y chilon-recall@0.1.3 install C:\path\to\your\documents
 ```
 
 The managed engine lives outside the temporary npx cache. Use CHILON_RECALL_HOME to choose a different persistent location, and run `setup` after upgrading the package.
@@ -114,7 +115,7 @@ To validate the runtime and private configuration, set RAG_MANAGER_CONFIG and th
 ```powershell
 $env:RAG_MANAGER_CONFIG = "C:\path\to\your\documents\chilon-recall.json"
 $env:RAG_API_KEY = "your-provider-key"
-npx -y chilon-recall@0.1.2 doctor
+npx -y chilon-recall@0.1.3 doctor
 ```
 
 If you installed from npm, you can now skip to [Connect an MCP client](#connect-an-mcp-client--连接-mcp-客户端). The remaining setup details are for source checkouts or custom configurations.
@@ -153,9 +154,9 @@ export CHILON_RECALL_PYTHON="$PWD/.venv/bin/python"
 npm start
 ```
 
-The server uses `stdio`, so it normally runs under an MCP client rather than in a standalone interactive terminal. Connect it, call `rag_status`, preview `rag_build`, and execute the build with the returned confirmation token.
+The server uses `stdio`, so it normally runs under an MCP client rather than in a standalone interactive terminal. Connect it, call `rag_status`, preview `rag_build`, and execute the build with the returned confirmation token. After documents change, refresh with `rag_sync` instead of rebuilding; it reuses vectors for unchanged files.
 
-server 使用 `stdio`，因此通常由 MCP client 启动，而不是作为独立交互式终端运行。连接后，先调用 `rag_status`，预览 `rag_build`，再使用返回的 confirmation token 执行建库。
+server 使用 `stdio`，因此通常由 MCP client 启动，而不是作为独立交互式终端运行。连接后，先调用 `rag_status`，预览 `rag_build`，再使用返回的 confirmation token 执行建库。资料发生变更后，请用 `rag_sync` 刷新而不是重建；未变更文件会复用已有向量。
 
 ## Connect an MCP client / 连接 MCP client
 
@@ -179,14 +180,14 @@ tool_timeout_sec = 1800
 default_tools_approval_mode = "writes"
 ```
 
-For an npm release, use a pinned npx command instead. Run npx -y chilon-recall@0.1.2 setup first under the same OS account. A pinned version prevents an unexpected package upgrade from changing a working MCP server.
+For an npm release, use a pinned npx command instead. Run npx -y chilon-recall@0.1.3 setup first under the same OS account. A pinned version prevents an unexpected package upgrade from changing a working MCP server.
 
-对于 npm 已发布版本，请改用固定版本的 npx 命令。先在同一操作系统账户下运行 npx -y chilon-recall@0.1.2 setup；固定版本可避免 package 意外升级改变已正常工作的 MCP server。
+对于 npm 已发布版本，请改用固定版本的 npx 命令。先在同一操作系统账户下运行 npx -y chilon-recall@0.1.3 setup；固定版本可避免 package 意外升级改变已正常工作的 MCP server。
 
 ```toml
 [mcp_servers.chilon-recall]
 command = "npx"
-args = ["-y", "chilon-recall@0.1.2", "mcp"]
+args = ["-y", "chilon-recall@0.1.3", "mcp"]
 env_vars = ["RAG_MANAGER_CONFIG", "RAG_API_KEY", "RAG_RERANK_API_KEY"]
 startup_timeout_sec = 15
 tool_timeout_sec = 1800
@@ -261,7 +262,7 @@ For an npm release, replace command and args with the following and omit CHILON_
 
 ```json
 "command": "npx",
-"args": ["-y", "chilon-recall@0.1.2", "mcp"]
+"args": ["-y", "chilon-recall@0.1.3", "mcp"]
 ```
 
 Set `RAG_API_KEY` in the environment inherited by Claude Desktop, or add it only to your private local client configuration when your operating system cannot provide it. Claude Desktop stores `env` values in a local JSON file, so restrict file permissions and never commit that file. On Windows, use the virtual environment's `python.exe` path.
@@ -325,8 +326,8 @@ Configuration and index tools:
 
 - `rag_save_config` updates only schema-approved, non-secret fields and creates a backup of the JSON file.
 - `rag_save_config` 仅修改 schema 允许的非敏感字段，并创建 JSON 文件备份。
-- `rag_build`, `rag_clear_index`, and `rag_restore_index` require `action: "preview"` first. The preview returns a short-lived token bound to the current configuration and source/index state. Use that token once with `action: "execute"`.
-- `rag_build`、`rag_clear_index` 与 `rag_restore_index` 必须先使用 `action: "preview"`。预览会返回一个绑定当前配置和来源/索引状态的短期 token，再使用该 token 一次性执行 `action: "execute"`。
+- `rag_build`, `rag_sync`, `rag_clear_index`, and `rag_restore_index` require `action: "preview"` first. The preview returns a short-lived token bound to the current configuration and source/index state. `rag_sync` hashes files, reuses compatible unchanged vectors, and reconciles added, modified, and deleted files; it falls back to a full rebuild when indexing settings change or an older manifest lacks the required hashes.
+- `rag_build`、`rag_sync`、`rag_clear_index` 与 `rag_restore_index` 必须先使用 `action: "preview"`。预览会返回一个绑定当前配置和来源/索引状态的短期 token。`rag_sync` 对文件进行哈希，复用兼容的未变更向量，并同步新增、修改和删除；索引设置变化或旧 manifest 缺少所需哈希时会回退为全量重建。
 
 ## Provider configuration / Provider 配置
 
@@ -392,12 +393,12 @@ The publication check rejects likely secrets, personal email addresses, and user
 
 ## Limits / 已知限制
 
-- Version 0.1.2 indexes UTF-8 `.md`, `.txt`, `.rst`, and `.csv` text. Convert PDFs to reviewed text first; scanned PDFs need OCR.
-- v0.1.2 只索引 UTF-8 `.md`、`.txt`、`.rst` 和 `.csv` 文本。PDF 应先转换为经过核对的文本；扫描版 PDF 需要 OCR。
+- Version 0.1.3 indexes UTF-8 `.md`, `.txt`, `.rst`, and `.csv` text. Convert PDFs to reviewed text first; scanned PDFs need OCR.
+- v0.1.3 只索引 UTF-8 `.md`、`.txt`、`.rst` 和 `.csv` 文本。PDF 应先转换为经过核对的文本；扫描版 PDF 需要 OCR。
 - The included chunker recognizes Markdown `#` and `##` headings. It does not yet parse tables, citations, or document-native structure semantically.
 - 内置 chunker 识别 Markdown `#` 和 `##` headings，暂时不会从语义上解析表格、引文或原生文档结构。
-- Rebuilding is full-index, not incremental.
-- 当前建库是全量重建，不是增量索引。
+- `rag_build` is a deliberate full rebuild. Use `rag_sync` for content-hash incremental synchronization; it always writes a new staged FAISS index so row IDs remain aligned with metadata.
+- `rag_build` 是明确的全量重建入口。内容哈希增量同步请使用 `rag_sync`；它始终在 staging 中写出新的 FAISS 索引，以保证行 ID 与元数据对齐。
 - Local embedding and reranker models are not bundled in the first release.
 - 首版不内置本地 embedding 和 reranker 模型。
 - Retrieval returns evidence candidates; it does not prove that the collection is complete, current, correct, or internally consistent.
@@ -405,8 +406,6 @@ The publication check rejects likely secrets, personal email addresses, and user
 
 ## Roadmap / 路线图
 
-- Incremental indexing and content hashing
-- 基于内容哈希的增量索引
 - First-class PDF extraction/OCR adapters with coverage reports
 - 带覆盖报告的 PDF 提取/OCR adapter
 - Local embedding and reranking providers
