@@ -7,6 +7,7 @@ import test from "node:test";
 import {
   applyConfigPatch,
   configSchema,
+  describeConfigError,
   publicConfig,
   readConfig,
   writeConfigAtomically
@@ -64,6 +65,28 @@ test("configuration is resolved, redacted, patched, and written atomically", asy
   assert.equal((await readConfig(configPath)).data.chunking.max_chars, 900);
   assert.equal((await readConfig(configPath)).data.embedding.model, "next-model");
   assert.equal(await fs.readFile(`${configPath}.bak`, "utf8"), JSON.stringify(config(project, rag)));
+});
+
+test("describeConfigError turns a ZodError into a readable sentence instead of raw issue JSON", () => {
+  // Regression: ZodError#message is `JSON.stringify(issues)`; a caller that surfaces
+  // error.message directly (a CLI report, an MCP tool error) printed that raw JSON
+  // dump at the user for something as ordinary as a typo'd config key.
+  const valid = config("../kb", "../kb/.chilon-recall");
+  let error;
+  try {
+    configSchema.parse({ ...valid, extra_field: "oops" });
+  } catch (caught) {
+    error = caught;
+  }
+  assert.ok(error, "expected configSchema.parse to throw");
+  const message = describeConfigError(error);
+  assert.doesNotMatch(message, /^\[/);
+  assert.doesNotMatch(message, /"code"/);
+  assert.match(message, /extra_field/);
+});
+
+test("describeConfigError passes through a plain Error's message unchanged", () => {
+  assert.equal(describeConfigError(new Error("plain failure")), "plain failure");
 });
 
 test("rag_dir must remain inside project_dir", async () => {

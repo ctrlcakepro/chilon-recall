@@ -4,7 +4,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-import { readConfig, resolveConfigPath } from "../src/config.mjs";
+import { describeConfigError, readConfig, resolveConfigPath } from "../src/config.mjs";
 import {
   fileExists,
   findBootstrapPython,
@@ -72,16 +72,27 @@ export async function initializeConfig(directory, { force = false } = {}) {
   return configPath;
 }
 
-export async function installProject(directory, { force = false, setup = setupEngine } = {}) {
+export async function installProject(directory, { force = false, setup = setupEngine, onProgress, onOutput } = {}) {
   if (!directory) {
     throw new Error("install requires a document directory.");
   }
-  const engine = await setup();
+  const engine = await setup({ onProgress, onOutput });
   const configPath = await initializeConfig(directory, { force });
   return {
     config: configPath,
     engine,
     next: "Set RAG_MANAGER_CONFIG to this path and provide provider credentials only through environment variables."
+  };
+}
+
+// `setup`/`install` print a single JSON result on stdout (scripts parse it), so
+// engine-setup progress — otherwise up to a minute of total silence while pip
+// installs faiss/numpy/httpx — goes to stderr instead, where it can't corrupt that
+// JSON but still reaches an interactive terminal.
+function cliProgress() {
+  return {
+    onProgress: (message) => process.stderr.write(`${message}\n`),
+    onOutput: (chunk) => process.stderr.write(chunk)
   };
 }
 
@@ -144,7 +155,7 @@ async function doctor() {
       }. Edit it to your provider's real endpoint and model (or run \`chilon-recall key\` to find one) before building an index.`;
     }
   } catch (error) {
-    report.configuration.error = error.message;
+    report.configuration.error = describeConfigError(error);
   }
   writeJson(report);
   return report.bootstrap_python.ready &&
@@ -230,7 +241,7 @@ export async function main(argv = process.argv.slice(2)) {
     return 0;
   }
   if (command === "setup") {
-    writeJson(await setupEngine());
+    writeJson(await setupEngine(cliProgress()));
     return 0;
   }
   if (command === "install") {
@@ -240,7 +251,7 @@ export async function main(argv = process.argv.slice(2)) {
     if (args.filter((arg) => arg !== "--force").length > 1) {
       throw new Error("`install` accepts at most one document directory.");
     }
-    writeJson(await installProject(directory, { force }));
+    writeJson(await installProject(directory, { force, ...cliProgress() }));
     return 0;
   }
   if (command === "init") {
@@ -287,7 +298,7 @@ if (invokedDirectly) {
       if (typeof code === "number") process.exitCode = code;
     })
     .catch((error) => {
-      process.stderr.write(`Chilon Recall CLI failed: ${error.message}\n`);
+      process.stderr.write(`Chilon Recall CLI failed: ${describeConfigError(error)}\n`);
       process.exitCode = 1;
     });
 }

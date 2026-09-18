@@ -6,7 +6,8 @@ import { recommendModels } from "./models.mjs";
 export function renderKeySetup({ baseUrl, apiKey, envName, rerankEnvName, modelIds }) {
   const recommendation = recommendModels(modelIds);
   const notes = [
-    "This output only goes to your terminal; chilon-recall never writes the key to a file.",
+    "This output only goes to your terminal; chilon-recall itself never writes the key to a file.",
+    "The \"persists\" commands do, though, if you choose to run them: `setx` stores the key in your Windows user environment (registry), and the `>> ~/.bashrc` line appends it in plaintext to that file. Either command will also remain in your shell history and terminal scrollback.",
     "setx / the persistent export only affect new terminals — restart your MCP client after running them."
   ];
   if (rerankEnvName && rerankEnvName !== envName) {

@@ -26,30 +26,35 @@ export function promptSecret(label, { input = process.stdin, output = process.st
       input.removeListener("data", onData);
     };
 
-    const onData = (char) => {
-      switch (char) {
-        case "\n":
-        case "\r":
-        case "":
-          cleanup();
-          output.write("\n");
-          resolve(value.trim());
-          return;
-        case "":
-          cleanup();
-          output.write("\n");
-          reject(new Error("Cancelled."));
-          return;
-        case "":
-        case "\b":
-          if (value.length > 0) {
-            value = value.slice(0, -1);
-            output.write("\b \b");
-          }
-          return;
-        default:
-          value += char;
-          output.write("*");
+    // A single "data" event can carry more than one character: pasting into a raw-mode
+    // stdin delivers the whole clipboard chunk (including any newlines it contains) as
+    // one event, not one event per character. Iterate so paste and keystrokes behave alike.
+    const onData = (chunk) => {
+      for (const char of chunk) {
+        switch (char) {
+          case "\n":
+          case "\r":
+          case "":
+            cleanup();
+            output.write("\n");
+            resolve(value.trim());
+            return;
+          case "":
+            cleanup();
+            output.write("\n");
+            reject(new Error("Cancelled."));
+            return;
+          case "":
+          case "\b":
+            if (value.length > 0) {
+              value = value.slice(0, -1);
+              output.write("\b \b");
+            }
+            break;
+          default:
+            value += char;
+            output.write("*");
+        }
       }
     };
 

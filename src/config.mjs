@@ -87,6 +87,18 @@ export const configSchema = z
     }
   });
 
+// A ZodError's own `.message` is a JSON dump of `.issues` (Zod v3 default), so any
+// caller that surfaces `error.message` directly (a CLI report, an MCP tool error)
+// ends up printing raw internal error-object JSON at the user instead of a sentence.
+export function describeConfigError(error) {
+  if (error instanceof z.ZodError) {
+    return error.issues
+      .map((issue) => `${issue.path.length ? issue.path.join(".") : "(root)"}: ${issue.message}`)
+      .join("; ");
+  }
+  return error instanceof Error ? error.message : String(error);
+}
+
 function stripBom(text) {
   return text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
 }

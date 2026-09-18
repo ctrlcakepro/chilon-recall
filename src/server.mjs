@@ -8,6 +8,7 @@ import { z } from "zod";
 
 import {
   applyConfigPatch,
+  describeConfigError,
   publicConfig,
   readConfig,
   resolveConfigPath,
@@ -37,7 +38,7 @@ function textAndStructured(data) {
 function toolError(error) {
   return {
     isError: true,
-    content: [{ type: "text", text: error instanceof Error ? error.message : String(error) }]
+    content: [{ type: "text", text: describeConfigError(error) }]
   };
 }
 
