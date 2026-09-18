@@ -1,6 +1,6 @@
-// Qoder IDE compatibility layer.
+// Qoder client compatibility layer.
 //
-// Qoder reads MCP servers from its own IDE settings (Settings -> MCP), and reads
+// Qoder reads MCP servers from its own client settings (Settings -> MCP), and reads
 // project-level skills from `.qoder/skills/<name>/SKILL.md` and project rules from
 // `.qoder/rules/`. This module renders those artifacts for a target project from the
 // same stdio server and skill definitions the other clients use, so the retrieval
@@ -42,7 +42,7 @@ Apply when a request depends on the local Chilon Recall knowledge base.
 `;
 
 /**
- * Render the MCP server entry to paste into Qoder IDE Settings -> MCP.
+ * Render the MCP server entry to paste into Qoder client Settings -> MCP.
  * `env` carries placeholders only; real secrets belong in the OS environment.
  */
 export function qoderMcpConfig({ node = process.execPath, root = packageRoot } = {}) {
@@ -121,9 +121,9 @@ export async function installQoder(directory, { force = false, root = packageRoo
     mcp_server: QODER_SERVER_NAME,
     forwarded_env: QODER_ENV_VARS,
     next: [
-      "Open Qoder IDE Settings -> MCP -> My Servers -> + Add and paste .qoder/mcp.json, replacing the RAG_MANAGER_CONFIG placeholder.",
+      "Open Qoder client Settings -> MCP -> My Servers -> + Add and paste .qoder/mcp.json, replacing the RAG_MANAGER_CONFIG placeholder.",
       "Provide RAG_API_KEY (and RAG_RERANK_API_KEY when reranking is enabled) through the environment Qoder inherits; never commit them.",
-      "Restart Qoder IDE so the generated skills and rules are loaded."
+      "Restart the Qoder client so the generated skills and rules are loaded."
     ]
   };
 }

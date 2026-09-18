@@ -198,7 +198,7 @@ bundle 会在 `CHILON_RECALL_ROOT` 中运行 `node scripts/cli.mjs mcp`。如果
 
 ### Qoder
 
-Qoder IDE 从自身设置中加载 MCP server，并从项目内的 `.qoder/` 目录加载项目级 skills 与 rules。可用一条命令生成这三部分：
+Qoder 客户端从自身设置中加载 MCP server，并从项目内的 `.qoder/` 目录加载项目级 skills 与 rules。可用一条命令生成这三部分：
 
 ```powershell
 npx -y chilon-recall@0.1.3 qoder C:\path\to\your\project
@@ -206,7 +206,7 @@ npx -y chilon-recall@0.1.3 qoder C:\path\to\your\project
 
 该命令会写入 `.qoder/mcp.json`、每个内置 skill 对应的 `.qoder/skills/<name>/SKILL.md`，以及 `.qoder/rules/chilon-recall.md`。若要覆盖已有文件，请加 `--force`。
 
-Qoder 不会自动读取 `.qoder/mcp.json`，它只是一份可共享的配置片段。请打开 **Qoder IDE Settings → MCP → My Servers → + Add**，粘贴其内容，并把 `RAG_MANAGER_CONFIG` 占位符替换为你的私有配置路径：
+Qoder 不会自动读取 `.qoder/mcp.json`，它只是一份可共享的配置片段。请打开 **Qoder 客户端 Settings → MCP → My Servers → + Add**，粘贴其内容，并把 `RAG_MANAGER_CONFIG` 占位符替换为你的私有配置路径：
 
 ```json
 {
@@ -225,7 +225,7 @@ Qoder 不会自动读取 `.qoder/mcp.json`，它只是一份可共享的配置�
 }
 ```
 
-请在 Qoder 可继承的系统环境中设置 `RAG_API_KEY`（启用 reranking 时还需 `RAG_RERANK_API_KEY`）。生成的文件可以提交到版本库，其中绝不应写入凭据。重启 Qoder IDE 以加载生成的 skills 与 rules，并在 **My Servers** 中确认工具已出现。
+请在 Qoder 可继承的系统环境中设置 `RAG_API_KEY`（启用 reranking 时还需 `RAG_RERANK_API_KEY`）。生成的文件可以提交到版本库，其中绝不应写入凭据。重启 Qoder 客户端以加载生成的 skills 与 rules，并在 **My Servers** 中确认工具已出现。
 
 ## 工作原理
 

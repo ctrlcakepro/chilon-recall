@@ -271,9 +271,9 @@ Set `RAG_API_KEY` in the environment inherited by Claude Desktop, or add it only
 
 ### Qoder / Qoder 配置
 
-Qoder IDE loads MCP servers from its own settings, and project-level skills and rules from the `.qoder/` directory. Generate all three from a checkout or an npm install:
+The Qoder client loads MCP servers from its own settings, and project-level skills and rules from the `.qoder/` directory. Generate all three from a checkout or an npm install:
 
-Qoder IDE 从自身设置中加载 MCP server，并从项目内的 `.qoder/` 目录加载项目级 skills 与 rules。可用一条命令生成这三部分：
+Qoder 客户端从自身设置中加载 MCP server，并从项目内的 `.qoder/` 目录加载项目级 skills 与 rules。可用一条命令生成这三部分：
 
 ```powershell
 npx -y chilon-recall@0.1.3 qoder C:\path\to\your\project
@@ -283,9 +283,9 @@ This writes `.qoder/mcp.json`, `.qoder/skills/<name>/SKILL.md` for every bundled
 
 该命令会写入 `.qoder/mcp.json`、每个内置 skill 对应的 `.qoder/skills/<name>/SKILL.md`，以及 `.qoder/rules/chilon-recall.md`。若要覆盖已有文件，请加 `--force`。
 
-Qoder does not read `.qoder/mcp.json` automatically; it is a shareable snippet. Open **Qoder IDE Settings → MCP → My Servers → + Add**, paste its contents, and replace the `RAG_MANAGER_CONFIG` placeholder with your private configuration path:
+Qoder does not read `.qoder/mcp.json` automatically; it is a shareable snippet. Open **Qoder client Settings → MCP → My Servers → + Add**, paste its contents, and replace the `RAG_MANAGER_CONFIG` placeholder with your private configuration path:
 
-Qoder 不会自动读取 `.qoder/mcp.json`，它只是一份可共享的配置片段。请打开 **Qoder IDE Settings → MCP → My Servers → + Add**，粘贴其内容，并把 `RAG_MANAGER_CONFIG` 占位符替换为你的私有配置路径：
+Qoder 不会自动读取 `.qoder/mcp.json`，它只是一份可共享的配置片段。请打开 **Qoder 客户端 Settings → MCP → My Servers → + Add**，粘贴其内容，并把 `RAG_MANAGER_CONFIG` 占位符替换为你的私有配置路径：
 
 ```json
 {
@@ -304,9 +304,9 @@ Qoder 不会自动读取 `.qoder/mcp.json`，它只是一份可共享的配置�
 }
 ```
 
-Set `RAG_API_KEY` (and `RAG_RERANK_API_KEY` when reranking is enabled) in the environment Qoder inherits. The generated files are safe to commit; credentials never belong in them. Restart Qoder IDE so the generated skills and rules load, then confirm the tools under **My Servers**.
+Set `RAG_API_KEY` (and `RAG_RERANK_API_KEY` when reranking is enabled) in the environment Qoder inherits. The generated files are safe to commit; credentials never belong in them. Restart the Qoder client so the generated skills and rules load, then confirm the tools under **My Servers**.
 
-请在 Qoder 可继承的系统环境中设置 `RAG_API_KEY`（启用 reranking 时还需 `RAG_RERANK_API_KEY`）。生成的文件可以提交到版本库，其中绝不应写入凭据。重启 Qoder IDE 以加载生成的 skills 与 rules，并在 **My Servers** 中确认工具已出现。
+请在 Qoder 可继承的系统环境中设置 `RAG_API_KEY`（启用 reranking 时还需 `RAG_RERANK_API_KEY`）。生成的文件可以提交到版本库，其中绝不应写入凭据。重启 Qoder 客户端以加载生成的 skills 与 rules，并在 **My Servers** 中确认工具已出现。
 
 ## How it works / 工作原理
 

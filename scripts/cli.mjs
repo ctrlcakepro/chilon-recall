@@ -26,7 +26,7 @@ Usage:
   chilon-recall init <directory> [--force]
                                       Create a private config in a document directory.
   chilon-recall qoder <directory> [--force]
-                                      Generate the Qoder IDE surface (.qoder/mcp.json, skills, rules).
+                                      Generate the Qoder client surface (.qoder/mcp.json, skills, rules).
   chilon-recall setup       Create or update the isolated Python engine.
   chilon-recall doctor      Check Node, Python engine, and private configuration.
   chilon-recall mcp         Start the stdio MCP server (the default command).
