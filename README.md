@@ -58,7 +58,15 @@ $env:RAG_API_KEY = "your-provider-key"
 npx -y chilon-recall@0.1.4 doctor
 ```
 
-Not sure which model to pick? `chilon-recall key --base-url https://api.example.com/v1` prompts for the key once (hidden input), calls the provider's own `/models` endpoint to suggest an embedding and reranker model, and prints ready-to-run `$env:`/`setx`/`export` commands with the key already filled in. The key is used for that one request only — it is never written to a file.
+`doctor` is an offline check: it catches the template placeholders and a missing key, but it never contacts your provider, so a real-looking `base_url` with a typo, or a wrong key, still passes. Then confirm them online with the key wizard:
+
+```powershell
+npx -y chilon-recall@0.1.4 key --base-url https://your-provider.example/v1
+```
+
+It prompts for the key once (hidden input), calls the provider's own `/models` endpoint — a mistyped URL fails here, and so does a key the provider rejects — suggests an embedding and reranker model, and prints ready-to-run `$env:`/`setx`/`export` commands with the key already filled in. chilon-recall uses the key for that one request only and never writes it to a file; the printed `setx` / `>> ~/.bashrc` commands do store it in plaintext if you run them.
+
+> **Paste the key as a single line.** The prompt submits at the first line break it receives, including one inside the pasted text: anything after it is discarded. If your clipboard holds more than the key (for example a copied `KEY=...` block), copy the key alone.
 
 ### 3. Connect one client
 
