@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-09-21
+
+- Add `AGENTS_INSTALL.md` / `AGENTS_INSTALL.zh-CN.md`: a runbook an AI coding agent can follow to install and configure chilon-recall end to end. The API key step is deliberately left to the human — the agent is instructed to hand it back rather than pipe the key through its own shell or context. Both READMEs link to it from Quick start.
+- Fix `AGENTS_INSTALL.md`/`.zh-CN.md` never telling the agent to set `RAG_MANAGER_CONFIG`, found by dry-running the runbook end to end: `doctor`, `key`, and the MCP server all require it with no default, so a literal first-time follow of the original text failed at the `doctor` check. The agent now persists it itself right after `install` (it isn't a secret), and the Claude Desktop snippet writes it straight into that client's `env` block instead of relying on environment inheritance.
+- Known issue, unresolved: on 2026-09-18, `npx -y chilon-recall@0.1.4 <command>` — including `--help` and with no subcommand at all — failed on Windows with `'chilon-recall' is not recognized as an internal or external command`, while the identical package contents ran correctly via a direct `node scripts/cli.mjs` invocation or by calling the installed `.bin` shim directly. `npm cache verify` and a `--prefer-online` forced re-fetch ruled out a corrupted local cache; `package.json`'s `bin`/`scripts`/`engines`/`dependencies` and the resolved `node_modules/.bin` shims were byte-identical to the working 0.1.3 install. On 2026-09-21 the failure no longer reproduced on the same machine (Node 26.3, npm 11.16): `npx -y chilon-recall@0.1.4 --help`, `doctor`, and `@latest --version` all ran normally, with no change to the package or to the registry in between. The cause is still unknown, so the failure may recur. This release contains no fix for it, and whether 0.1.5 works via `npx` says nothing about the cause. If you hit it, run `node <install-dir>/scripts/cli.mjs` or `npm install -g chilon-recall` as a workaround, and please open an issue with the npm debug log and the contents of the matching `npm-cache/_npx/<hash>/node_modules/.bin` directory before clearing the cache.
+
 ## [0.1.4] - 2026-09-18
 
 - Add `chilon-recall key`: a hidden-input prompt for a provider API key that calls the provider's own `/models` endpoint, suggests an embedding and reranker model, and prints ready-to-run `$env:`/`setx`/`export` commands. The key is used for a single request and is never written to disk.

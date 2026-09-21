@@ -4,7 +4,7 @@
 
 **Local-first knowledge retrieval for learning and serious knowledge work.**
 
-[![version](https://img.shields.io/badge/version-0.1.4-blue.svg)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.1.5-blue.svg)](CHANGELOG.md)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![node](https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg)](https://nodejs.org)
 [![python](https://img.shields.io/badge/python-%3E%3D3.10-brightgreen.svg)](https://www.python.org)
@@ -40,12 +40,14 @@ It is an independent retrieval companion in the [Chilon Knowledge Work Harness](
 
 > **New to MCP?** You only need a document folder, Node.js 20+, and Python 3.10+. Follow these three steps first; client configuration and technical details come later.
 
+> **Using an AI coding agent instead (Claude Code, Codex CLI, Cursor, …)?** Paste this to it: *"Read https://raw.githubusercontent.com/ctrlcakepro/chilon-recall/main/AGENTS_INSTALL.md and follow it to install chilon-recall for me. My document folder is: `<path>`."* It automates everything below except typing your own API key — see [AGENTS_INSTALL.md](AGENTS_INSTALL.md) for exactly what it will and won't do on its own.
+
 ### 1. Install into your document folder
 
 Run the command below once. It creates a private configuration and a managed Python engine; it never stores API keys in the package or configuration file.
 
 ```powershell
-npx -y chilon-recall@0.1.4 install C:\path\to\your\documents
+npx -y chilon-recall@0.1.5 install C:\path\to\your\documents
 ```
 
 ### 2. Set your provider key
@@ -55,13 +57,13 @@ Open the generated `chilon-recall.json` and replace the placeholder `embedding.b
 ```powershell
 $env:RAG_MANAGER_CONFIG = "C:\path\to\your\documents\chilon-recall.json"
 $env:RAG_API_KEY = "your-provider-key"
-npx -y chilon-recall@0.1.4 doctor
+npx -y chilon-recall@0.1.5 doctor
 ```
 
 `doctor` is an offline check: it catches the template placeholders and a missing key, but it never contacts your provider, so a real-looking `base_url` with a typo, or a wrong key, still passes. Then confirm them online with the key wizard:
 
 ```powershell
-npx -y chilon-recall@0.1.4 key --base-url https://your-provider.example/v1
+npx -y chilon-recall@0.1.5 key --base-url https://your-provider.example/v1
 ```
 
 It prompts for the key once (hidden input), calls the provider's own `/models` endpoint — a mistyped URL fails here, and so does a key the provider rejects — suggests an embedding and reranker model, and prints ready-to-run `$env:`/`setx`/`export` commands with the key already filled in. chilon-recall uses the key for that one request only and never writes it to a file; the printed `setx` / `>> ~/.bashrc` commands do store it in plaintext if you run them.
@@ -106,7 +108,7 @@ Requires Node.js 20+ and Python 3.10+.
 Use the published, pinned npm release to create a private configuration and install the isolated Python engine with one command:
 
 ```powershell
-npx -y chilon-recall@0.1.4 install C:\path\to\your\documents
+npx -y chilon-recall@0.1.5 install C:\path\to\your\documents
 ```
 
 This writes `chilon-recall.json` in the document directory and creates a persistent managed Python engine in the operating system's user-data area. Both files are required for local operation; credentials remain outside both of them.
@@ -120,7 +122,7 @@ To validate the runtime and private configuration:
 ```powershell
 $env:RAG_MANAGER_CONFIG = "C:\path\to\your\documents\chilon-recall.json"
 $env:RAG_API_KEY = "your-provider-key"
-npx -y chilon-recall@0.1.4 doctor
+npx -y chilon-recall@0.1.5 doctor
 ```
 
 `doctor` exits `0` only when Python, the managed engine, the configuration, and its credentials are all ready — otherwise `1`, so it is safe to gate a script on. It also refuses to call the placeholder `embedding.base_url`/`model` from the install template "ready".
@@ -186,12 +188,12 @@ tool_timeout_sec = 1800
 default_tools_approval_mode = "writes"
 ```
 
-**npm release** — run `npx -y chilon-recall@0.1.4 setup` first under the same OS account. A pinned version prevents an unexpected package upgrade from changing a working MCP server.
+**npm release** — run `npx -y chilon-recall@0.1.5 setup` first under the same OS account. A pinned version prevents an unexpected package upgrade from changing a working MCP server.
 
 ```toml
 [mcp_servers.chilon-recall]
 command = "npx"
-args = ["-y", "chilon-recall@0.1.4", "mcp"]
+args = ["-y", "chilon-recall@0.1.5", "mcp"]
 env_vars = ["RAG_MANAGER_CONFIG", "RAG_API_KEY", "RAG_RERANK_API_KEY"]
 startup_timeout_sec = 15
 tool_timeout_sec = 1800
@@ -250,7 +252,7 @@ For an npm release, replace `command` and `args` with the following and omit `CH
 
 ```json
 "command": "npx",
-"args": ["-y", "chilon-recall@0.1.4", "mcp"]
+"args": ["-y", "chilon-recall@0.1.5", "mcp"]
 ```
 
 Set `RAG_API_KEY` in the environment inherited by Claude Desktop, or add it only to your private local client configuration when your operating system cannot provide it. Claude Desktop stores `env` values in a local JSON file, so restrict file permissions and never commit that file. On Windows, use the virtual environment's `python.exe` path.
@@ -260,12 +262,12 @@ Set `RAG_API_KEY` in the environment inherited by Claude Desktop, or add it only
 The Qoder client loads MCP servers from its own settings, and project-level skills and rules from the `.qoder/` directory. Generate all three from a checkout or an npm install:
 
 ```powershell
-npx -y chilon-recall@0.1.4 qoder C:\path\to\your\project
+npx -y chilon-recall@0.1.5 qoder C:\path\to\your\project
 ```
 
 This writes `.qoder/mcp.json`, `.qoder/skills/<name>/SKILL.md` for every bundled skill, and `.qoder/rules/chilon-recall.md`. Add `--force` to regenerate over existing files.
 
-> **Generating from `npx` embeds an unstable path.** `npx` unpacks the package into a temporary per-run cache (e.g. `...\npm-cache\_npx\<hash>\...` on Windows), and the `node`/`cli.mjs` path written into `.qoder/mcp.json` points there. Clearing the npm cache or bumping the pinned version moves that path and the MCP server stops starting, with no error beyond Qoder failing to load it. The command detects this and prints a warning; prefer running `chilon-recall qoder` from a stable install (`npm install -g chilon-recall@0.1.4`, or a source checkout) so the generated path survives cache clears.
+> **Generating from `npx` embeds an unstable path.** `npx` unpacks the package into a temporary per-run cache (e.g. `...\npm-cache\_npx\<hash>\...` on Windows), and the `node`/`cli.mjs` path written into `.qoder/mcp.json` points there. Clearing the npm cache or bumping the pinned version moves that path and the MCP server stops starting, with no error beyond Qoder failing to load it. The command detects this and prints a warning; prefer running `chilon-recall qoder` from a stable install (`npm install -g chilon-recall@0.1.5`, or a source checkout) so the generated path survives cache clears.
 
 Qoder does not read `.qoder/mcp.json` automatically; it is a shareable snippet. Open **Qoder client Settings → MCP → My Servers → + Add**, paste its contents, and replace the `RAG_MANAGER_CONFIG` placeholder with your private configuration path:
 
@@ -354,7 +356,7 @@ The publication check rejects likely secrets, personal email addresses, and user
 
 ## Limits
 
-- Version 0.1.4 indexes UTF-8 `.md`, `.txt`, `.rst`, and `.csv` text. Convert PDFs to reviewed text first; scanned PDFs need OCR.
+- Version 0.1.5 indexes UTF-8 `.md`, `.txt`, `.rst`, and `.csv` text. Convert PDFs to reviewed text first; scanned PDFs need OCR.
 - The included chunker recognizes Markdown `#` and `##` headings. It does not yet parse tables, citations, or document-native structure semantically.
 - `rag_build` is a deliberate full rebuild. Use `rag_sync` for content-hash incremental synchronization; it always writes a new staged FAISS index so row IDs remain aligned with metadata.
 - Local embedding and reranker models are not bundled in the first release.

@@ -4,7 +4,7 @@
 
 **面向学习与严肃知识工作的本地优先知识检索引擎。**
 
-[![version](https://img.shields.io/badge/version-0.1.4-blue.svg)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.1.5-blue.svg)](CHANGELOG.md)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![node](https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg)](https://nodejs.org)
 [![python](https://img.shields.io/badge/python-%3E%3D3.10-brightgreen.svg)](https://www.python.org)
@@ -40,12 +40,14 @@ Chilon Recall 可将你自己的文本资料转换为私有、来源可追溯的
 
 > **第一次接触 MCP？** 你只需要一个资料文件夹、Node.js 20+ 和 Python 3.10+。先完成下面三步；客户端配置和技术细节在后文。
 
+> **想用 AI coding agent（Claude Code、Codex CLI、Cursor 等）代劳？** 把这句话复制给它：*"请读取 https://raw.githubusercontent.com/ctrlcakepro/chilon-recall/main/AGENTS_INSTALL.zh-CN.md，照着帮我安装 chilon-recall。我的文档目录是：`<路径>`。"* 除了输入你自己的 API key 之外，其余步骤它都能替你完成——具体哪些能自动、哪些故意留给你，见 [AGENTS_INSTALL.zh-CN.md](AGENTS_INSTALL.zh-CN.md)。
+
 ### 1. 安装到资料文件夹
 
 运行一次下面的命令。它会创建私有配置与受管 Python engine；不会把 API key 写入 package 或配置文件。
 
 ```powershell
-npx -y chilon-recall@0.1.4 install C:\path\to\your\documents
+npx -y chilon-recall@0.1.5 install C:\path\to\your\documents
 ```
 
 ### 2. 设置 provider key
@@ -55,13 +57,13 @@ npx -y chilon-recall@0.1.4 install C:\path\to\your\documents
 ```powershell
 $env:RAG_MANAGER_CONFIG = "C:\path\to\your\documents\chilon-recall.json"
 $env:RAG_API_KEY = "your-provider-key"
-npx -y chilon-recall@0.1.4 doctor
+npx -y chilon-recall@0.1.5 doctor
 ```
 
 `doctor` 是离线检查：它能发现模板占位值和缺失的 key，但不会联系你的 provider，所以一个"看起来真实但拼错了一个字母"的 `base_url`，或者一个错误的 key，仍然会通过。接下来用 key 向导做一次在线确认：
 
 ```powershell
-npx -y chilon-recall@0.1.4 key --base-url https://your-provider.example/v1
+npx -y chilon-recall@0.1.5 key --base-url https://your-provider.example/v1
 ```
 
 它会提示你粘贴一次 key（终端隐藏输入），调用该 provider 自己的 `/models` 接口——URL 拼错会在这一步直接报错，被 provider 拒绝的 key 也一样——推荐一个 embedding 和一个 reranker 模型，并打印出已经填好真实 key、可直接复制运行的 `$env:` / `setx` / `export` 命令。chilon-recall 只把这个 key 用于这一次请求，绝不写入任何文件；但打印出的 `setx` / `>> ~/.bashrc` 命令如果你执行了，会把 key 以明文存进注册表或 shell 配置文件。
@@ -106,7 +108,7 @@ Chilon Recall 同时支持直接检索和可复用的学习工作流：
 使用已发布且固定版本的 npm package，只需一条命令即可创建私有配置并安装独立 Python engine：
 
 ```powershell
-npx -y chilon-recall@0.1.4 install C:\path\to\your\documents
+npx -y chilon-recall@0.1.5 install C:\path\to\your\documents
 ```
 
 该命令会在资料目录写入 `chilon-recall.json`，并在操作系统用户数据目录创建持久的受管 Python engine。这两个文件是本地运行所必需的；凭据不会写入其中任何一个。
@@ -120,7 +122,7 @@ npx -y chilon-recall@0.1.4 install C:\path\to\your\documents
 ```powershell
 $env:RAG_MANAGER_CONFIG = "C:\path\to\your\documents\chilon-recall.json"
 $env:RAG_API_KEY = "your-provider-key"
-npx -y chilon-recall@0.1.4 doctor
+npx -y chilon-recall@0.1.5 doctor
 ```
 
 只有当 Python、托管 engine、配置文件及其凭据都就绪时，`doctor` 才会以退出码 `0` 结束；否则退出码为 `1`，可以放心用于脚本化验收。安装模板里的占位 `embedding.base_url`/`model` 也不会被视为"就绪"。
@@ -188,12 +190,12 @@ tool_timeout_sec = 1800
 default_tools_approval_mode = "writes"
 ```
 
-**npm 已发布版本** —— 先在同一操作系统账户下运行 `npx -y chilon-recall@0.1.4 setup`。固定版本可避免 package 意外升级改变已正常工作的 MCP server。
+**npm 已发布版本** —— 先在同一操作系统账户下运行 `npx -y chilon-recall@0.1.5 setup`。固定版本可避免 package 意外升级改变已正常工作的 MCP server。
 
 ```toml
 [mcp_servers.chilon-recall]
 command = "npx"
-args = ["-y", "chilon-recall@0.1.4", "mcp"]
+args = ["-y", "chilon-recall@0.1.5", "mcp"]
 env_vars = ["RAG_MANAGER_CONFIG", "RAG_API_KEY", "RAG_RERANK_API_KEY"]
 startup_timeout_sec = 15
 tool_timeout_sec = 1800
@@ -252,7 +254,7 @@ bundle 会在 `CHILON_RECALL_ROOT` 中运行 `node scripts/cli.mjs mcp`。如果
 
 ```json
 "command": "npx",
-"args": ["-y", "chilon-recall@0.1.4", "mcp"]
+"args": ["-y", "chilon-recall@0.1.5", "mcp"]
 ```
 
 应在 Claude Desktop 能继承的系统环境中设置 `RAG_API_KEY`；若操作系统无法提供，只能把它加入你本机的私有客户端配置。Claude Desktop 会把 `env` 值保存在本地 JSON 中，因此请限制文件权限，且绝不能提交该配置。Windows 用户应指向虚拟环境中的 `python.exe`。
@@ -262,12 +264,12 @@ bundle 会在 `CHILON_RECALL_ROOT` 中运行 `node scripts/cli.mjs mcp`。如果
 Qoder 客户端从自身设置中加载 MCP server，并从项目内的 `.qoder/` 目录加载项目级 skills 与 rules。可用一条命令生成这三部分：
 
 ```powershell
-npx -y chilon-recall@0.1.4 qoder C:\path\to\your\project
+npx -y chilon-recall@0.1.5 qoder C:\path\to\your\project
 ```
 
 该命令会写入 `.qoder/mcp.json`、每个内置 skill 对应的 `.qoder/skills/<name>/SKILL.md`，以及 `.qoder/rules/chilon-recall.md`。若要覆盖已有文件，请加 `--force`。
 
-> **用 `npx` 生成会写入一个不稳定的路径。** `npx` 会把包解压到一个临时的、按次运行的缓存目录（Windows 上类似 `...\npm-cache\_npx\<hash>\...`），写入 `.qoder/mcp.json` 的 `node`/`cli.mjs` 路径就指向那里。清理 npm 缓存或升级固定版本号都会移动这个路径，导致 MCP server 悄悄起不来，且没有明显报错——只会看到 Qoder 加载失败。该命令会检测到这种情况并打印警告；建议先做一次稳定安装（`npm install -g chilon-recall@0.1.4`，或使用源码 checkout），再从那个安装位置运行 `chilon-recall qoder`，这样生成的路径才不会因清缓存而失效。
+> **用 `npx` 生成会写入一个不稳定的路径。** `npx` 会把包解压到一个临时的、按次运行的缓存目录（Windows 上类似 `...\npm-cache\_npx\<hash>\...`），写入 `.qoder/mcp.json` 的 `node`/`cli.mjs` 路径就指向那里。清理 npm 缓存或升级固定版本号都会移动这个路径，导致 MCP server 悄悄起不来，且没有明显报错——只会看到 Qoder 加载失败。该命令会检测到这种情况并打印警告；建议先做一次稳定安装（`npm install -g chilon-recall@0.1.5`，或使用源码 checkout），再从那个安装位置运行 `chilon-recall qoder`，这样生成的路径才不会因清缓存而失效。
 
 Qoder 不会自动读取 `.qoder/mcp.json`，它只是一份可共享的配置片段。请打开 **Qoder 客户端 Settings → MCP → My Servers → + Add**，粘贴其内容，并把 `RAG_MANAGER_CONFIG` 占位符替换为你的私有配置路径：
 
@@ -356,7 +358,7 @@ npm audit --audit-level=high
 
 ## 已知限制
 
-- v0.1.4 只索引 UTF-8 `.md`、`.txt`、`.rst`、`.csv`。PDF 应先转换为经过核对的文本，扫描版需 OCR。
+- v0.1.5 只索引 UTF-8 `.md`、`.txt`、`.rst`、`.csv`。PDF 应先转换为经过核对的文本，扫描版需 OCR。
 - 分块器识别 Markdown `#` 与 `##` 标题，尚未语义解析表格、引文或原生文档结构。
 - `rag_build` 保留为全量重建入口；`rag_sync` 使用内容哈希做增量同步，并在 staging 中重建 FAISS，以保持行 ID 与元数据严格对齐。
 - 首版不内置本地 embedding/reranker 模型。
